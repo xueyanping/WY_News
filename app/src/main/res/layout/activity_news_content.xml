@@ -1,0 +1,72 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <!-- titleBar-->
+    <RelativeLayout
+        android:id="@+id/titlebar"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="#b4b3b3"
+        android:gravity="center_vertical">
+        <ImageButton
+            android:id="@+id/back"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@android:color/transparent"
+            android:scaleType="centerInside"
+            android:src="@mipmap/back" />
+
+        <TextView
+            android:id="@+id/type"
+            android:layout_width="100sp"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:gravity="center"
+            android:background="#e71d1d"
+            android:clickable="true"
+            android:onClick="click"
+            android:text="头条"
+            android:textColor="#ffffff"
+            android:textSize="15sp" />
+        <ImageButton
+            android:id="@+id/rightmore_content"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:background="@android:color/transparent"
+            android:scaleType="centerInside"
+            android:src="@mipmap/menu_moreoverflow" />
+    </RelativeLayout>
+
+    <!-- 内容-->
+    <LinearLayout
+        android:id="@+id/scroll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/titlebar"
+        android:layout_marginLeft="6dp"
+        android:layout_marginRight="3dp"
+        >
+
+   <!-- <TextView
+    android:id="@+id/tv_title"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+      android:gravity="center"
+    android:text="123"
+        android:textSize="25sp"/>-->
+    </LinearLayout>
+    <WebView
+        android:id="@+id/webview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+
+    </WebView>
+
+</LinearLayout>
+

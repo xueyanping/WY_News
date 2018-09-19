@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+<include
+    layout="@layout/xinwen_title_bar">
+
+</include>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+        <RadioGroup
+            android:id="@+id/xinwen_radiogroup"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/xinwen_rb1"
+                style="@style/radio_style"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="头条" />
+
+            <RadioButton
+                android:id="@+id/xinwen_rb2"
+                style="@style/radio_style"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="娱乐" />
+
+            <RadioButton
+                android:id="@+id/xinwen_rb3"
+                style="@style/radio_style"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="军事" />
+
+            <RadioButton
+                android:id="@+id/xinwen_rb4"
+                style="@style/radio_style"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="体育" />
+        </RadioGroup>
+        <TextView
+            android:id="@+id/xinwen_indicator"
+            android:layout_width="@dimen/xinwen_xia_text"
+            android:layout_height="2dp"
+            android:background="#E30E0C" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#E30E0C" />
+    </LinearLayout>
+
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/xinwen_viewpager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </android.support.v4.view.ViewPager>
+</LinearLayout>
