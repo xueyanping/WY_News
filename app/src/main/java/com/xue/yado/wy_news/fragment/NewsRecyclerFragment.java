@@ -39,7 +39,7 @@ import com.xue.yado.wy_news.R;
 import com.xue.yado.wy_news.activity.MultiPhotoActivity;
 import com.xue.yado.wy_news.activity.NewsContentActivity;
 import com.xue.yado.wy_news.bean.Toutiao;
-import com.xue.yado.wy_news.bean.YuLe;
+
 import com.xue.yado.wy_news.listener.ObservableOnNextListener;
 
 import com.xue.yado.wy_news.myView.MyRecyclerAdapter;
@@ -75,9 +75,6 @@ public class NewsRecyclerFragment extends android.support.v4.app.Fragment {
     View view;
     int START_INDEX = 0;
     int END_INDEX = 10;
-
-
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -154,24 +151,25 @@ public class NewsRecyclerFragment extends android.support.v4.app.Fragment {
         ObservableOnNextListener<String> listener = new ObservableOnNextListener<String>() {
             @Override
             public void onNext(String s) {
-                Log.i("onNext: ", "onNext: "+s);
-
+               Log.i("onNext: ", "onNext: "+s);
                 Toutiao toutiao = XinWenJson.getdata(s, type);
-                  Log.i("onNext:", "onNext: "+toutiao.getT1348647853363().size());
-
                 toutiao_list = toutiao.getT1348647853363();
+                Log.i("onNext:", "toutiao_list.size: "+toutiao_list.size());
                 if(toutiao_list.size()>0){
                     adapter.clearDatas();
                     adapter.addDatas(toutiao_list);
-                    listads = toutiao_list.get(0).getAds();
-                }
-                Log.i("onNext: ", "onNext: "+listads.size());
-                if(showLunbo()!=null){
-                    adapter.addHeaderView(showLunbo());
+                    if(toutiao_list.get(0).getAds()!=null && toutiao_list.get(0).getAds().size()>0){
+                        listads = toutiao_list.get(0).getAds();
+                    }else{
+                        listads = null;
+                    }
+                    View view = showLunbo();
+                    if(view != null ){
+                        adapter.addHeaderView(view);
+                    }
                 }
             }
         };
-
 
         switch (type){
             case "toutiao":
@@ -180,7 +178,12 @@ public class NewsRecyclerFragment extends android.support.v4.app.Fragment {
             case "yule":
                 RetrofitMethods.Wngyi_YuLeData(start,end,new MyObservable(listener,getContext()));
                 break;
-
+            case "junshi":
+                RetrofitMethods.Wngyi_JunShiData(start,end,new MyObservable(listener,getContext()));
+                break;
+            case "tiyu":
+                RetrofitMethods.Wngyi_TiYuData(start,end,new MyObservable(listener,getContext()));
+                break;
         }
     }
 
@@ -192,163 +195,188 @@ public class NewsRecyclerFragment extends android.support.v4.app.Fragment {
     }
 
 
+    public void lunboToActivity(int position){
+        String type = listads.get(position).getSkipType();
+        Log.i( "onClick: ","type==="+type);
+        int typecode ;
+        if(type == null){
+            typecode = NewsAdapter.PUTONG;
+        }else{
+            typecode = NewsAdapter.getSkipType(type);
+        }
+        switch(typecode){
+            case NewsAdapter.PUTONG:
+            case NewsAdapter.ZHUANTI:
+                Intent intent = new Intent(getActivity(),NewsContentActivity.class);
+                intent.putExtra("title",listads.get(position).getTitle());
+                intent.putExtra("content_url",listads.get(position).getUrl());
+                startActivity(intent);
+                // getActivity().overridePendingTransition(R.anim.xinwen_inactivity, R.anim.xinwen_inactivity);
+                break;
+            case NewsAdapter.DUOTU:
+                String SkipID = listads.get(position).getSkipID();
+                String url_key = SkipID.substring(SkipID.lastIndexOf("|")-4);
+                url_key = url_key.replaceAll("\\|","/");
+                String url = "http://c.3g.163.com/photo/api/set/" + url_key + ".json";
+                Intent intent2 = new Intent(getActivity(),MultiPhotoActivity.class);
+                intent2.putExtra("url_json",url);
+                intent2.putExtra("title",listads.get(position).getTitle());
+                startActivity(intent2);
+                break;
+        }
+    }
+
+
     //轮播显示的方法
     private List<Lunbo> lunboList = new ArrayList<>();
     private View lunboView;
     private LinearLayout linearLayouticon;
-    private ImageView beforicon;//轮播上一个icon
+          List<ImageView> dot_list = new ArrayList<>();
     private ViewPager lunbo_viewPager;
-    String xiangxiUrl;//跳转详细页面的url
-//    List<XinWen_toutiao.T1348647853363Entity.AdsEntity> listads;//字段listads
-    int currentItem;
+            String xiangxiUrl;//跳转详细页面的url
+    int currentItem = 0;
     int oldItem = 0;
     int size =0;
     private View showLunbo() {
         lunboList.clear();
+       // dot_list.clear();
         if (listads == null) {
             return null;
         }
         size = listads.size();
-        LogUtils.e("size=="+size);
-        lunboView = View.inflate(getActivity(), R.layout.xinwen_toutiao_lunbo, null);
+        if(lunboView == null){
+            lunboView = View.inflate(getActivity(), R.layout.xinwen_toutiao_lunbo, null);
+        }
         //如果只有一个图片则不轮播
         if (size == 1) {
             TextView title = (TextView) lunboView.findViewById(R.id.toutiao_lunboyitu_title);
-            title.setText(toutiao_list.get(0).getAds().get(0).getTitle());
+            title.setText(listads.get(0).getTitle());
             ImageView lunbo_yitu = (ImageView) lunboView.findViewById(R.id.daohang_lunbo_yitu);
             lunbo_yitu.setVisibility(View.VISIBLE);
-            xiangxiUrl = toutiao_list.get(0).getAds().get(0).getUrl();
-            new BitmapUtils(getContext()).display(lunbo_yitu, toutiao_list.get(0).getAds().get(0).getImgsrc());
+            xiangxiUrl = listads.get(0).getUrl();
+            new BitmapUtils(getContext()).display(lunbo_yitu, listads.get(0).getImgsrc());
             lunbo_yitu.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    // TODO: 2015/11/14
                     //一个图片的轮播跳转的页面
-                  //  framentlunbo2activity(0);
+                   lunboToActivity(0);
                 }
             });
             return lunboView;
-        }
-        linearLayouticon = (LinearLayout) lunboView.findViewById(R.id.toutitao_lunbo_ll);
-        //轮播icon以及把数据添加到lunboList
 
-        for (int i = 0; i < size; i++) {
-            //开辟一个宽和高的空间放入icon
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(30, ViewGroup.LayoutParams.WRAP_CONTENT);
-            ImageView icon = new ImageView(getActivity());
-            icon.setLayoutParams(params);//设置icon宽高
-            icon.setImageResource(R.mipmap.toutiao_lunbo_icon);
-            linearLayouticon.addView(icon);//添加到布局
-            final ImageView image = new ImageView(getActivity());
-            String SkipID = listads.get(i).getSkipID();
-            String url_key = SkipID.substring(SkipID.lastIndexOf("|")-4);
-            url_key = url_key.replaceAll("\\|","/");
-            String url = "http://c.3g.163.com/photo/api/set/" + url_key + ".json";
-            Log.i("showLunbo", "showLunbo: "+url);
-            HttpUtils httpUtils = new HttpUtils();
-            httpUtils.send(HttpRequest.HttpMethod.POST, url, new RequestCallBack<String>() {
-                @Override
-                public void onSuccess(ResponseInfo<String> responseInfo) {
-                    String str = responseInfo.result;
-                     // Log.i( "onSuccess: ","onSuccess: "+str);
-                    try {
-                        JSONObject jsonObject = new JSONObject(str);
-                        JSONArray jsonArray = jsonObject.getJSONArray("photos");
+        }else if(size>1){
+
+            if(linearLayouticon == null){
+                linearLayouticon = (LinearLayout) lunboView.findViewById(R.id.toutitao_lunbo_ll);
+                //轮播icon以及把数据添加到lunboList
+                for (int i = 0; i < size; i++) {
+                    //开辟一个宽和高的空间放入icon
+                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(30, ViewGroup.LayoutParams.WRAP_CONTENT);
+                    ImageView icon = new ImageView(getActivity());
+                    icon.setLayoutParams(params);//设置icon宽高
+                    icon.setImageResource(R.mipmap.toutiao_lunbo_icon);
+                    dot_list.add(icon);
+                    linearLayouticon.addView(icon);//添加到布局
+                     }
+            }
+
+            for (int i = 0; i < size; i++) {
+                final ImageView image = new ImageView(getActivity());
+                String SkipID = listads.get(i).getSkipID();
+                String url_key = SkipID.substring(SkipID.lastIndexOf("|")-4);
+                url_key = url_key.replaceAll("\\|","/");
+                String url = "http://c.3g.163.com/photo/api/set/" + url_key + ".json";
+                Log.i("showLunbo", "showLunbo: "+url);
+                HttpUtils httpUtils = new HttpUtils();
+                httpUtils.send(HttpRequest.HttpMethod.POST, url, new RequestCallBack<String>() {
+                    @Override
+                    public void onSuccess(ResponseInfo<String> responseInfo) {
+                        String str = responseInfo.result;
+                        try {
+                            JSONObject jsonObject = new JSONObject(str);
+                            JSONArray jsonArray = jsonObject.getJSONArray("photos");
                             JSONObject o = (JSONObject) jsonArray.get(0);
                             String imgurl = o.getString("imgurl");
-                           new BitmapUtils(getContext()).display(image,imgurl);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+                            new BitmapUtils(getContext()).display(image,imgurl);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
                     }
 
-                }
-
-                @Override
-                public void onFailure(HttpException e, String s) {
-                    Log.i( "onFailure: ","onFailure: ");
-                }
-            });
-            image.setScaleType(ImageView.ScaleType.FIT_XY);
-            image.setTag(i);
-            image.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                  //  Log.i( "onClick: ","tag=="+view.getTag());
-                    String type = listads.get(0).getSkipType();
-                    Log.i( "onClick: ","type==="+type);
-                    int typecode ;
-                    if(type == null){
-                        typecode = NewsAdapter.PUTONG;
-                    }else{
-                        typecode = NewsAdapter.getSkipType(type);
+                    @Override
+                    public void onFailure(HttpException e, String s) {
+                        Log.i( "onFailure: ","onFailure: ");
                     }
-                    switch(typecode){
-                        case NewsAdapter.PUTONG:
-                        case NewsAdapter.ZHUANTI:
-                            Intent intent = new Intent(getActivity(),NewsContentActivity.class);
-                            intent.putExtra("title",toutiao_list.get(0).getAds().get((Integer) view.getTag()).getTitle());
-                            intent.putExtra("content_url",toutiao_list.get(0).getAds().get((Integer) view.getTag()).getUrl());
-                            startActivity(intent);
-                            // getActivity().overridePendingTransition(R.anim.xinwen_inactivity, R.anim.xinwen_inactivity);
-                            break;
-                        case NewsAdapter.DUOTU:
-                            String SkipID = toutiao_list.get(0).getAds().get((Integer) view.getTag()).getSkipID();
-                            String url_key = SkipID.substring(SkipID.lastIndexOf("|")-4);
-                            url_key = url_key.replaceAll("\\|","/");
-                            String url = "http://c.3g.163.com/photo/api/set/" + url_key + ".json";
-                            Intent intent2 = new Intent(getActivity(),MultiPhotoActivity.class);
-                            intent2.putExtra("url_json",url);
-                            intent2.putExtra("title",toutiao_list.get(0).getAds().get((Integer) view.getTag()).getTitle());
-                            startActivity(intent2);
-                            break;
+                });
+                image.setScaleType(ImageView.ScaleType.FIT_XY);
+                image.setTag(i);
+                image.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        lunboToActivity((Integer) view.getTag());
+                    }
+                });
+                xiangxiUrl = listads.get(i).getUrl();
+                Lunbo lunbo = new Lunbo(listads.get(i).getTitle(), xiangxiUrl, image);
+                lunboList.add(lunbo);
+
+            }
+
+            //设置第一个图片的标题
+            final TextView title = (TextView) lunboView.findViewById(R.id.toutiao_lunbo_title);
+            title.setText(lunboList.get(0).getTitle());
+
+
+
+            if(lunbo_viewPager == null){
+
+                lunbo_viewPager = (ViewPager) lunboView.findViewById(R.id.toutiao_lunbo_viewpager);
+                lunbo_viewPager.setVisibility(View.VISIBLE);
+                lunbo_viewPager.setOffscreenPageLimit(0);
+                lunbo_viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+                    @Override
+                    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
                     }
 
-                }
-            });
-            xiangxiUrl = toutiao_list.get(0).getAds().get(i).getUrl();
-            lunboList.add(new Lunbo(toutiao_list.get(0).getAds().get(i).getTitle(), xiangxiUrl, image));
+                    @Override
+                    public void onPageSelected(int position) {
+
+                        int m = position%size;
+                        title.setText(lunboList.get(m).getTitle());
+//                        dot_list.get(oldItem).setImageResource(R.mipmap.toutiao_lunbo_icon);
+//                        dot_list.get(currentItem).setImageResource(R.mipmap.toutiao_lunbo_icon2);
+//
+
+                        for(int i=0;i<size;i++){
+                            if(i==m){
+                                dot_list.get(i).setImageResource(R.mipmap.toutiao_lunbo_icon2);
+                            }else {
+                                dot_list.get(i).setImageResource(R.mipmap.toutiao_lunbo_icon);
+                            }
+                        }
+                        currentItem = position;
+                    }
+
+                    @Override
+                    public void onPageScrollStateChanged(int state) {
+                    }
+                });
+
+                Lunboadapter lunboadapter = new Lunboadapter();
+                lunbo_viewPager.setAdapter(lunboadapter);
+                lunbo_viewPager.setCurrentItem(0);
+            }
+
+            if (thread == null) {//如果只有一个图片不需要轮播
+                startthreadLunbo();//开启子线程轮播
+                thread.start();
+            }
+            return lunboView;
         }
-        //设置第一个图片的标题
-        final TextView title = (TextView) lunboView.findViewById(R.id.toutiao_lunbo_title);
-        title.setText(lunboList.get(0).getTitle());
 
-        //设置最后一个的icon图片控件
-
-        beforicon = (ImageView) linearLayouticon.getChildAt(size - 1);
-
-        lunbo_viewPager = (ViewPager) lunboView.findViewById(R.id.toutiao_lunbo_viewpager);
-        lunbo_viewPager.setVisibility(View.VISIBLE);
-        lunbo_viewPager.setOffscreenPageLimit(0);
-        lunbo_viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-
-                int i = position % size;
-                Log.i( "onPageSelected: ","i==== "+i);
-                title.setText(lunboList.get(i).getTitle());
-                ImageView currmIcon = (ImageView) linearLayouticon.getChildAt(i);
-                currmIcon.setImageResource(R.mipmap.toutiao_lunbo_icon2);//设置当前的图片
-                beforicon.setImageResource(R.mipmap.toutiao_lunbo_icon);//改变上一个图片
-                beforicon = currmIcon;
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-            }
-        });
-        Lunboadapter lunboadapter = new Lunboadapter();
-        lunbo_viewPager.setAdapter(lunboadapter);
-        lunbo_viewPager.setCurrentItem(0);
-        if (thread == null) {//如果只有一个图片不需要轮播
-            startthreadLunbo();//开启子线程轮播
-            thread.start();
+         return null;
         }
-        return lunboView;
-    }
 
 
 
@@ -360,7 +388,6 @@ public class NewsRecyclerFragment extends android.support.v4.app.Fragment {
                 while (true) {
                     try {
                         Thread.sleep(2000);
-
                         handler.sendEmptyMessage(1);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
@@ -369,12 +396,12 @@ public class NewsRecyclerFragment extends android.support.v4.app.Fragment {
             }
         };
     }
+
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            if(msg.what==1){
-                lunbo_viewPager.setCurrentItem(lunbo_viewPager.getCurrentItem()+1);
-                Log.i( "handleMessage: ","msg==="+(lunbo_viewPager.getCurrentItem()+1));
+            if(msg.what == 1){
+                lunbo_viewPager.setCurrentItem(((currentItem+1)));
             }
         }
     };
@@ -394,8 +421,14 @@ public class NewsRecyclerFragment extends android.support.v4.app.Fragment {
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
             try {
-                container.addView(lunboList.get(position % lunboList.size()).getImageView());
-                return lunboList.get(position % lunboList.size()).getImageView();
+                View v=lunboList.get(position%size).getImageView();
+                ViewGroup parent = (ViewGroup) v.getParent();
+
+                if (parent != null) {
+                    parent.removeAllViews();
+                }
+                container.addView(lunboList.get(position %size).getImageView());
+                return lunboList.get(position %size ).getImageView();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -408,9 +441,6 @@ public class NewsRecyclerFragment extends android.support.v4.app.Fragment {
             container.removeView((View) object);
         }
     }
-
-
-
 
     //轮播工具类
     class Lunbo {

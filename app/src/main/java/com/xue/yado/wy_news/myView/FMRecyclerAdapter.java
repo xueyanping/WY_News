@@ -2,7 +2,6 @@ package com.xue.yado.wy_news.myView;
 
 import android.content.Context;
 import android.graphics.BitmapFactory;
-import android.preference.PreferenceActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -11,24 +10,26 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.lidroid.xutils.BitmapUtils;
 import com.xue.yado.wy_news.R;
+import com.xue.yado.wy_news.bean.FM;
 import com.xue.yado.wy_news.bean.Toutiao;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
  * Created by Administrator on 2018/9/3.
  */
 
-public class MyRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class FMRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private RecyclerView mRecyclerView;
 
-    private List<Toutiao.T1348647853363Bean> toutiao_list = new ArrayList<>();
+    private List<FM.DataBean.ListBean> toutiao_list = new ArrayList<>();
     private Context context;
 
     private View VIEW_FOOTER;
@@ -40,7 +41,7 @@ public class MyRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     private int TYPE_FOOTER = 1002;
     private OnItemClickListener listener;
 
-    public MyRecyclerAdapter(Context mContext) {
+    public FMRecyclerAdapter(Context mContext) {
         //this.toutiao_list = data;
         this.context = mContext;
     }
@@ -61,22 +62,24 @@ public class MyRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         if (!isHeaderView(position) && !isFooterView(position)) {
             if (haveHeaderView())
                 position--;
-            TextView  title = holder.itemView.findViewById(R.id.text);
+            TextView title = holder.itemView.findViewById(R.id.text);
             ImageView image = holder.itemView.findViewById(R.id.image);
-            TextView digest = holder.itemView.findViewById(R.id.digest);
+           TextView time = holder.itemView.findViewById(R.id.digest);
             BitmapUtils bitmapUtils = new BitmapUtils(context);
-
             if (toutiao_list.get(position).getTitle() == null || toutiao_list.get(position).getTitle().equals("")) {
                 title.setText("暂无标题");
             } else {
                 title.setText(toutiao_list.get(position).getTitle());
             }
-            if (toutiao_list.get(position).getImgsrc() == null || toutiao_list.get(position).getImgsrc().equals("")) {
+            if (toutiao_list.get(position).getCoverMiddle() == null || toutiao_list.get(position).getCoverMiddle().equals("")) {
                 image.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.nopicture));
             } else {
-                bitmapUtils.display(image, toutiao_list.get(position).getImgsrc());
+                bitmapUtils.display(image, toutiao_list.get(position).getCoverMiddle());
             }
-                digest.setText(toutiao_list.get(position).getDigest());
+           Long cha = (System.currentTimeMillis()-toutiao_list.get(position).getCreatedAt());
+           cha = cha/1000/60/60/24;
+           time.setText("更新于"+cha+"天前");
+
         }
 
     }
@@ -147,7 +150,7 @@ public class MyRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         }
     }
 
-    public void addDatas(List<Toutiao.T1348647853363Bean> rows) {
+    public void addDatas(List<FM.DataBean.ListBean> rows) {
         toutiao_list.addAll(rows);
         notifyDataSetChanged();
         Log.i( "addDatas: ","addDatas: "+toutiao_list.size());
@@ -208,7 +211,7 @@ public class MyRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
 
     public interface OnItemClickListener{
-        void itemClick(int position, List<Toutiao.T1348647853363Bean> toutiao_list);
+        void itemClick(int position, List<FM.DataBean.ListBean> toutiao_list);
     }
 
     public void setOnItemClick(OnItemClickListener listener){

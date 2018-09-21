@@ -21,4 +21,12 @@ public interface RetrofitService {
    //http://c.3g.163.com/nc/article/list/T1348648517839/0-20.html 网易娱乐
    @GET("article/list/T1348648517839/{startIndex}-{endIndex}.html")
    Observable<String> getWangyi_YuLeData(@Path("startIndex") int startIndex, @Path("endIndex") int endIndex);
+
+   //http://c.m.163.com/nc/article/list/T1348648141035/0-20.html  军事
+   @GET("article/list/T1348648141035/{startIndex}-{endIndex}.html")
+   Observable<String> getWangyi_JunShiData(@Path("startIndex") int startIndex, @Path("endIndex") int endIndex);
+
+   //http://c.m.163.com/nc/article/list/T1348649079062/体育
+   @GET("article/list/T1348649079062/{startIndex}-{endIndex}.html")
+   Observable<String> getWangyi_TiYuData(@Path("startIndex") int startIndex, @Path("endIndex") int endIndex);
 }

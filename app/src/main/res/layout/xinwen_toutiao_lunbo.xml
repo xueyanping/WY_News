@@ -32,7 +32,7 @@
             android:layout_alignBottom="@+id/toutiao_lunbo_viewpager"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
-            android:text="123" />
+            />
         <TextView
             android:id="@+id/toutiao_lunboyitu_title"
             android:layout_width="match_parent"

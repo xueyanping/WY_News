@@ -29,26 +29,27 @@ public class XinWenJson {
                     array=object.getJSONArray("T1348647853363");//头条
                     break;
                 case "yule":
-                    array=object.getJSONArray("T1348648517839");//娱乐T1348648517839
+                    array=object.getJSONArray("T1348648517839");//娱乐
                     break;
                 case "tiyu":
                     array = object.getJSONArray("T1348649079062");//体育
-
+                    break;
                 case "junshi":
                     array=object.getJSONArray("T1348648141035");//军事
                     break;
-
             }
            // Log.i( "getdata: ","getdata: "+array);
 
             List<Toutiao.T1348647853363Bean> list=new ArrayList<>();
             for (int i=0;i<array.length();i++){
-                Toutiao.T1348647853363Bean t1348647853363Entity=new Toutiao.T1348647853363Bean();
-                JSONObject arrayobj=array.getJSONObject(i);
+                Toutiao.T1348647853363Bean t1348647853363Entity = new Toutiao.T1348647853363Bean();
+                JSONObject arrayobj = array.getJSONObject(i);
+
                 if (!arrayobj.isNull("skipID")){
-                    String skipId=arrayobj.getString("skipID");
+                    String skipId = arrayobj.getString("skipID");
                     t1348647853363Entity.setSkipID(skipId);
                 }
+
                 if (!arrayobj.isNull("replyCount")){
                     int replyCount=arrayobj.getInt("replyCount");
                     t1348647853363Entity.setReplyCount(replyCount);
@@ -83,14 +84,11 @@ public class XinWenJson {
                     t1348647853363Entity.setUrl_3w(url_3w);
                 }
 
-//                LogUtils.e("xinwenjsont1348647853363Entity", i + "======" + t1348647853363Entity + "");
                 if (!arrayobj.isNull("imgextra")){
-                    JSONArray imagetraArray=arrayobj.getJSONArray("imgextra");
-                   // LogUtils.e("xinwenjsonimagetraArray", imagetraArray + "");
-                    List<Toutiao.T1348647853363Bean.ImgextraBean> listimagestra=new ArrayList<>();
+                    JSONArray imagetraArray = arrayobj.getJSONArray("imgextra");
+                    List<Toutiao.T1348647853363Bean.ImgextraBean> listimagestra = new ArrayList<>();
                     for (int j=0;j<imagetraArray.length();j++){
-                        Toutiao.T1348647853363Bean.ImgextraBean imgextraEntity=new Toutiao.T1348647853363Bean.ImgextraBean();
-
+                        Toutiao.T1348647853363Bean.ImgextraBean imgextraEntity = new Toutiao.T1348647853363Bean.ImgextraBean();
                         JSONObject imagestra=imagetraArray.getJSONObject(j);
                         String imagesra=imagestra.getString("imgsrc");
                         imgextraEntity.setImgsrc(imagesra);
@@ -140,7 +138,6 @@ public class XinWenJson {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-       // LogUtils.e("xinwenjson", "=======================================================");
         return null;
     }
 }

@@ -36,6 +36,7 @@
         </activity>
         <activity android:name=".activity.NewsContentActivity"></activity>
         <activity android:name=".activity.MultiPhotoActivity"></activity>
+        <activity android:name=".activity.FMDetailActivity"></activity>
     </application>
 
 </manifest>

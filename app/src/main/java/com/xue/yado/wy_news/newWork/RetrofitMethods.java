@@ -29,7 +29,18 @@ public class RetrofitMethods {
         retrofitObservable(MyRetrofit.getRetrofitService().getWangyi_YuLeData(startIndex,endIndex),observer);
     }
 
+    public static void Wngyi_JunShiData(int startIndex,int endIndex,Observer observer){
+        retrofitObservable(MyRetrofit.getRetrofitService().getWangyi_JunShiData(startIndex,endIndex),observer);
+    }
+
+    public static void Wngyi_TiYuData(int startIndex,int endIndex,Observer observer){
+        retrofitObservable(MyRetrofit.getRetrofitService().getWangyi_TiYuData(startIndex,endIndex),observer);
+    }
+
     public static void getDuoTuData(Observer observer){
         retrofitObservable(MyRetrofit.getRetrofitService().getDuoTu(),observer);
     }
+
+
+
 }
