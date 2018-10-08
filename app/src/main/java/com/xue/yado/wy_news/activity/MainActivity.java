@@ -1,5 +1,9 @@
 package com.xue.yado.wy_news.activity;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.os.Build;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -16,6 +20,8 @@ import java.util.List;
 import com.xue.yado.wy_news.R;
 import com.xue.yado.wy_news.fragment.*;
 
+import static android.os.Build.VERSION_CODES.M;
+
 public class MainActivity extends AppCompatActivity{
 
     private ViewPager viewPager;
@@ -23,12 +29,45 @@ public class MainActivity extends AppCompatActivity{
     private RadioButton rb_xinwen,rb_FM,rb_Music,rb_Setting;
     private List<Fragment> fragmentList;
     private FragmentPagerAdapter adapter;
+    private String[] PERMISSIONARRAY = {Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE};
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main);
-        initView();
+        requestPermission();
+
+    }
+
+    private void requestPermission() {
+        if(Build.VERSION.SDK_INT >= M){
+
+            if(checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+                    || checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+                this.requestPermissions(PERMISSIONARRAY,1);
+            }else{
+                initView();
+            }
+        }else{
+            initView();
+        }
+    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(requestCode == 1 && grantResults.length > 0){
+            int i;
+            for( i = 0;i<grantResults.length;i++){
+                if(grantResults[i] != PackageManager.PERMISSION_GRANTED){
+                    break;
+                }
+            }
+            if(i>=grantResults.length){
+                initView();
+            }
+        }
     }
 
     private void initView() {

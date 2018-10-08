@@ -12,6 +12,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.lidroid.xutils.HttpUtils;
@@ -22,6 +24,7 @@ import com.lidroid.xutils.http.client.HttpRequest;
 import com.xue.yado.wy_news.R;
 import com.xue.yado.wy_news.activity.FMDetailActivity;
 import com.xue.yado.wy_news.bean.FM;
+import com.xue.yado.wy_news.myView.FMAdapter;
 import com.xue.yado.wy_news.myView.FMRecyclerAdapter;
 
 import java.io.IOException;
@@ -42,7 +45,8 @@ public class FMFragment extends android.support.v4.app.Fragment  {
 
     FM fm;
     RecyclerView recyclerView;
-    FMRecyclerAdapter adapter;
+//    FMRecyclerAdapter adapter;
+    FMAdapter adapter;
     ArrayList<FM.DataBean.ListBean> fmList;
 
     @Override
@@ -51,11 +55,8 @@ public class FMFragment extends android.support.v4.app.Fragment  {
         super.onCreate(savedInstanceState);
     }
 
-
-
     @Override
     public View onCreateView(LayoutInflater inflater,ViewGroup container,Bundle savedInstanceState) {
-
         View view = inflater.inflate(R.layout.redian_view,container,false);
         initView(view);
         return view;
@@ -65,24 +66,43 @@ public class FMFragment extends android.support.v4.app.Fragment  {
         recyclerView = view.findViewById(R.id.recyclerview);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter = new FMRecyclerAdapter(getContext());
+//      adapter = new FMRecyclerAdapter(getContext());
+        adapter = new FMAdapter(getContext());
         recyclerView.setAdapter(adapter);
+        ImageView image = new ImageView(getContext());
+        image.setImageResource(R.drawable.progress_loading_image_02);
+//        adapter.addHeaderView(image);
         setItemClick();
     }
 
     private void setItemClick() {
-        adapter.setOnItemClick(new FMRecyclerAdapter.OnItemClickListener() {
-            @Override
-            public void itemClick(int position, List<FM.DataBean.ListBean> list) {
+       adapter.setOnItemClick(new FMRecyclerAdapter.OnItemClickListener<FM.DataBean.ListBean>() {
+           @Override
+           public void itemClick(int position, List<FM.DataBean.ListBean> list) {
+               Log.i( "itemClick: ","position=="+position);
+                int pos ;
+               if (adapter.haveHeaderView() && position == 0){
+                   pos = position;
+                   Toast.makeText(getContext(), "这是头部", Toast.LENGTH_SHORT).show();
+              }else{
+                   if(adapter.haveHeaderView()){
+                       pos = -- position;
+                   }else{
+                       pos = position;
+                   }
 
-                Intent intent = new Intent(getContext(), FMDetailActivity.class);
+                  Intent intent = new Intent(getContext(), FMDetailActivity.class);
+//                   Bundle bundle = new Bundle();
+//                   bundle.putSerializable("fm", fmList.get(pos));
+                   intent.putExtra("fm", fmList.get(pos));
+                  startActivity(intent);
+                  getActivity().overridePendingTransition(R.anim.in_anim,R.anim.in_anim);
 
-                intent.putExtra("list", fmList);
-                intent.putExtra("position",position);
-                startActivity(intent);
+              }
 
-            }
-        });
+               }
+
+       });
     }
 
     private void getData() {

@@ -205,8 +205,6 @@ public class MyRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         }
     }
 
-
-
     public interface OnItemClickListener{
         void itemClick(int position, List<Toutiao.T1348647853363Bean> toutiao_list);
     }

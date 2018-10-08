@@ -9,7 +9,8 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        useLibrary'org.apache.http.legacy' //解决xUtils 请求网络报无法访问HttpRequestBase 找不到org.apache.http.client.methods.HttpRequestBase的类文件
+        useLibrary 'org.apache.http.legacy'
+        //解决xUtils 请求网络报无法访问HttpRequestBase 找不到org.apache.http.client.methods.HttpRequestBase的类文件
     }
     buildTypes {
         release {
@@ -46,4 +47,6 @@ dependencies {
     compile 'com.scwang.smartrefresh:SmartRefreshLayout:1.0.4-4'
     //上拉刷新、下拉加载更多
     implementation files('libs/xUtils.jar')
+    //缓存音频和视频
+    compile 'com.danikula:videocache:2.7.0'
 }

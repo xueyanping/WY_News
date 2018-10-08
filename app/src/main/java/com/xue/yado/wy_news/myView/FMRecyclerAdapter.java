@@ -25,11 +25,11 @@ import java.util.List;
  * Created by Administrator on 2018/9/3.
  */
 
-public class FMRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public abstract class FMRecyclerAdapter<T> extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private RecyclerView mRecyclerView;
 
-    private List<FM.DataBean.ListBean> toutiao_list = new ArrayList<>();
+    private List<T> toutiao_list = new ArrayList<>();
     private Context context;
 
     private View VIEW_FOOTER;
@@ -39,21 +39,29 @@ public class FMRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     private int TYPE_NORMAL = 1000;
     private int TYPE_HEADER = 1001;
     private int TYPE_FOOTER = 1002;
-    private OnItemClickListener listener;
+    private OnItemClickListener<T> listener;
 
     public FMRecyclerAdapter(Context mContext) {
-        //this.toutiao_list = data;
         this.context = mContext;
     }
 
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(final ViewGroup parent, int viewType) {
         if (viewType == TYPE_FOOTER) {
             return new MyHolder(VIEW_FOOTER);
         } else if (viewType == TYPE_HEADER) {
             return new MyHolder(VIEW_HEADER);
         } else {
-            return new MyHolder(getLayout(R.layout.hadrecycler_itemview,parent,false));
+            View view = getLayout(R.layout.hadrecycler_itemview,parent,false);
+            final BaseViewHolder holder = new BaseViewHolder(view);
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int position = holder.getAdapterPosition();
+                        listener.itemClick(position, toutiao_list);
+                }
+            });
+            return holder;
         }
     }
 
@@ -62,27 +70,15 @@ public class FMRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         if (!isHeaderView(position) && !isFooterView(position)) {
             if (haveHeaderView())
                 position--;
-            TextView title = holder.itemView.findViewById(R.id.text);
-            ImageView image = holder.itemView.findViewById(R.id.image);
-           TextView time = holder.itemView.findViewById(R.id.digest);
-            BitmapUtils bitmapUtils = new BitmapUtils(context);
-            if (toutiao_list.get(position).getTitle() == null || toutiao_list.get(position).getTitle().equals("")) {
-                title.setText("暂无标题");
-            } else {
-                title.setText(toutiao_list.get(position).getTitle());
-            }
-            if (toutiao_list.get(position).getCoverMiddle() == null || toutiao_list.get(position).getCoverMiddle().equals("")) {
-                image.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.nopicture));
-            } else {
-                bitmapUtils.display(image, toutiao_list.get(position).getCoverMiddle());
-            }
-           Long cha = (System.currentTimeMillis()-toutiao_list.get(position).getCreatedAt());
-           cha = cha/1000/60/60/24;
-           time.setText("更新于"+cha+"天前");
-
+            BaseViewHolder viewHolder = (BaseViewHolder) holder;
+            onBindViewHolder(viewHolder,toutiao_list.get(position),position);
         }
 
     }
+
+    public abstract void onBindViewHolder(BaseViewHolder holder, T t,int position);
+
+
 
     @Override
     public int getItemCount() {
@@ -150,7 +146,7 @@ public class FMRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         }
     }
 
-    public void addDatas(List<FM.DataBean.ListBean> rows) {
+    public void addDatas(List<T> rows) {
         toutiao_list.addAll(rows);
         notifyDataSetChanged();
         Log.i( "addDatas: ","addDatas: "+toutiao_list.size());
@@ -210,8 +206,8 @@ public class FMRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
 
 
-    public interface OnItemClickListener{
-        void itemClick(int position, List<FM.DataBean.ListBean> toutiao_list);
+    public interface OnItemClickListener<T>{
+        void itemClick(int position, List<T> toutiao_list);
     }
 
     public void setOnItemClick(OnItemClickListener listener){
