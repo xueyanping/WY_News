@@ -1,6 +1,10 @@
 package com.xue.yado.wy_news.activity;
 
 import android.Manifest;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.support.annotation.NonNull;
@@ -13,9 +17,11 @@ import android.os.Bundle;
 import android.view.Window;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
+
 
 import com.xue.yado.wy_news.R;
 import com.xue.yado.wy_news.fragment.*;
@@ -37,6 +43,7 @@ public class MainActivity extends AppCompatActivity{
         setContentView(R.layout.activity_main);
         requestPermission();
 
+
     }
 
     private void requestPermission() {
@@ -52,6 +59,8 @@ public class MainActivity extends AppCompatActivity{
             initView();
         }
     }
+
+
 
 
     @Override
@@ -114,6 +123,7 @@ public class MainActivity extends AppCompatActivity{
                     break;
                 case R.id.rb_Setting:
                     viewPager.setCurrentItem(3);
+
                     break;
             }
         }

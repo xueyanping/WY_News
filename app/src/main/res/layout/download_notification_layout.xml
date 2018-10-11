@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="50dp"
+    android:padding="3dp" >
+
+    <ImageView
+        android:id="@+id/download_notificationImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/download_notificationProgress"
+        android:layout_alignParentTop="true"
+        android:paddingLeft="10dp"
+        android:src="@mipmap/download" />
+
+    <TextView
+        android:id="@+id/download_notificationTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_toRightOf="@id/download_notificationImage"
+        android:paddingLeft="120dp"
+        android:textColor="#000000"
+        android:text="正在下载"/>
+    <!-- android:textColor="#FF000000"  -->
+
+    <TextView
+        android:id="@+id/download_notificationPercent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_toLeftOf="@+id/download_notificationTitle"
+        android:layout_toStartOf="@+id/download_notificationTitle"
+        android:paddingTop="2dp"
+        android:text=""
+        android:textColor="#a1ec3e" />
+
+    <ProgressBar
+        android:id="@+id/download_notificationProgress"
+        style="@style/InitProgressBar"
+        android:layout_marginTop="5dp"
+        android:layout_width="wrap_content"
+        android:layout_height="5dp"
+        android:layout_alignLeft="@id/download_notificationTitle"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/download_notificationTitle"
+        android:paddingLeft="26dp"
+        android:paddingRight="3dp"
+        android:max="100"
+        android:paddingTop="2dp"
+        />
+
+</RelativeLayout>

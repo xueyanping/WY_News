@@ -58,8 +58,9 @@ public class CustomPopupWindow extends PopupWindow implements View.OnClickListen
      */
     @SuppressLint("InlinedApi")
     private void setPopupWindow() {
+        //        获取屏幕宽高
         WindowManager wm = (WindowManager) context .getSystemService(Context.WINDOW_SERVICE);
-        int width = wm.getDefaultDisplay().getWidth();
+       // int width = wm.getDefaultDisplay().getWidth();
         int height = wm.getDefaultDisplay().getHeight();
 
 
@@ -69,21 +70,22 @@ public class CustomPopupWindow extends PopupWindow implements View.OnClickListen
         this.setFocusable(true);// 设置弹出窗口可
         this.setAnimationStyle(R.style.popwindow_style);// 设置动画
         this.setBackgroundDrawable(new ColorDrawable(0x00000000));// 设置背景透明
-        mPopView.setOnTouchListener(new View.OnTouchListener() {// 如果触摸位置在窗口外面则销毁
-
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                // TODO Auto-generated method stub
-                int height = mPopView.findViewById(R.id.id_pop_layout).getTop();
-                int y = (int) event.getY();
-                if (event.getAction() == MotionEvent.ACTION_UP) {
-                    if (y < height) {
-                        dismiss();
-                    }
-                }
-                return true;
-            }
-        });
+        this.setOutsideTouchable(true);
+//        mPopView.setOnTouchListener(new View.OnTouchListener() {// 如果触摸位置在窗口外面则销毁
+//
+//            @Override
+//            public boolean onTouch(View v, MotionEvent event) {
+//                // TODO Auto-generated method stub
+//                int height = mPopView.findViewById(R.id.id_pop_layout).getTop();
+//                int y = (int) event.getY();
+//                if (event.getAction() == MotionEvent.ACTION_UP) {
+//                    if (y < height) {
+//                        dismiss();
+//                    }
+//                }
+//                return true;
+//            }
+//        });
     }
 
     /**
