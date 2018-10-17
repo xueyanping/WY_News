@@ -43,10 +43,12 @@ import com.lidroid.xutils.http.HttpHandler;
 import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.lidroid.xutils.http.callback.RequestCallBackHandler;
+import com.vondear.rxtools.view.RxToast;
 import com.xue.yado.wy_news.App;
 
 import com.xue.yado.wy_news.R;
 import com.xue.yado.wy_news.bean.FM;
+import com.xue.yado.wy_news.listener.PlayListener;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -68,14 +70,15 @@ import okio.Sink;
 @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
 public class PlayService extends Service implements MediaPlayer.OnCompletionListener,CacheListener{
     private  MediaPlayer player ;
+
     Uri uri;
     private final IBinder binder = (IBinder) new AudioBinder();
     int sec;
-   public static boolean isPause;
+    public static boolean isPause;
     boolean isCached = false;
     FM.DataBean.ListBean fm;
     String url;
-   private static final String notificationStrId = "1",notificationName = "2",download_notificationStrId = "01",download_notificationName = "02";
+    private static final String notificationStrId = "1",notificationName = "2",download_notificationStrId = "01",download_notificationName = "02";
     private static final int id = 5;
     private static final int down_id = 6;
     RemoteViews contentView,downContentView;
@@ -85,7 +88,9 @@ public class PlayService extends Service implements MediaPlayer.OnCompletionList
 
     NotificationManager notificationManager,download_notificationManager;
 
-   public  class NotificationBroadcastReceiver extends BroadcastReceiver
+
+
+    public  class NotificationBroadcastReceiver extends BroadcastReceiver
     {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -93,7 +98,6 @@ public class PlayService extends Service implements MediaPlayer.OnCompletionList
             switch (str){
                 case "download complete":
                     downContentView.setTextViewText(R.id.download_notificationTitle,"下载完成 点击查看");
-                    downContentView.setProgressBar(R.id.download_notificationProgress,100,100,false);
                     download_notificationManager.notify(down_id,download_notification);
                     break;
                 case "download updating":
@@ -101,7 +105,7 @@ public class PlayService extends Service implements MediaPlayer.OnCompletionList
                     downContentView.setTextViewText(R.id.download_notificationTitle,"正在下载");
                     downContentView.setTextViewText(R.id.download_notificationPercent, intent.getIntExtra("progress",0)+"%");
                     downContentView.setProgressBar(R.id.download_notificationProgress,100, intent.getIntExtra("progress",0),false);
-                    Log.i("onSuccess", "download ==="+intent.getIntExtra("progress",0));
+
                     download_notificationManager.notify(down_id,download_notification);
                     break;
                 case "download failure":
@@ -109,29 +113,35 @@ public class PlayService extends Service implements MediaPlayer.OnCompletionList
 //                    PendingIntent pendingIntent = PendingIntent.getService(PlayService.this,0x11,new Intent(PlayService.this,this.getClass()),PendingIntent.FLAG_CANCEL_CURRENT);
 //                    notification.contentIntent = pendingIntent;
                     download_notificationManager.cancel(down_id);
-
                     break;
                 case "pause":
                     if(PlayService.isPause){
-                        contentView.setImageViewBitmap(R.id.normal_notification_stop, BitmapFactory.decodeResource(getResources(),R.mipmap.bofang));
-                        PlayService.isPause = true;
-                    }else{
                         contentView.setImageViewBitmap(R.id.normal_notification_stop, BitmapFactory.decodeResource(getResources(),R.mipmap.stop));
+                        playOrStop(PlayService.isPause);
                         PlayService.isPause = false;
+
+                    }else{
+                        contentView.setImageViewBitmap(R.id.normal_notification_stop, BitmapFactory.decodeResource(getResources(),R.mipmap.bofang));
+                        playOrStop(PlayService.isPause);
+                        PlayService.isPause = true;
                     }
-                    playOrStop(PlayService.isPause);
                     notificationManager.notify(id,notification);
                     break;
+
                 case "next":
                     jin();
                     break;
                 case "last":
                     tui();
                     break;
+                case "cancel":
+                    notificationManager.cancel(id);
+                    break;
                 }
         }
 
     }
+
 
 
 
@@ -159,8 +169,8 @@ public class PlayService extends Service implements MediaPlayer.OnCompletionList
         filter.addAction("pause");
         filter.addAction("last");
         filter.addAction("next");
+        filter.addAction("cancel");
         PlayService.this.registerReceiver(notificationbroadcastreceiver, filter);
-
     }
 
     public   MediaPlayer getInstance(){
@@ -171,7 +181,6 @@ public class PlayService extends Service implements MediaPlayer.OnCompletionList
     }
 
 
-
     /**
      * 该方法在SDK2.0才開始有的。替代原来的onStart方法
      */
@@ -180,14 +189,14 @@ public class PlayService extends Service implements MediaPlayer.OnCompletionList
             getInstance();
             fm = (FM.DataBean.ListBean) intent.getSerializableExtra("fm");
             url = fm.getPlayUrl64();
-         //创建通知栏
+            //创建通知栏
             getNotification();
             HttpProxyCacheServer proxy = App.getProxy(this);
             proxy.registerCacheListener(this,url);
             isCached = proxy.isCached(url);
             if(isCached){
-                setsecondBar(100);
-            }
+            setsecondBar(100);
+        }
             String proxyUrl = proxy.getProxyUrl(url,true);
             uri = Uri.parse(proxyUrl);
             player.reset();
@@ -217,13 +226,15 @@ public class PlayService extends Service implements MediaPlayer.OnCompletionList
     @Override
     public void onCacheAvailable(File cacheFile, String url, int percentsAvailable) {
         setsecondBar(percentsAvailable);
+               // Log.i( "onCacheAvailable: ","1111111111"+percentsAvailable);
+
         if(percentsAvailable == 100){
             isCached = true;
+            return ;
         }else{
             isCached = false;
         }
     }
-
 
     //为了和Activity交互，须要定义一个Binder对象
    public class AudioBinder extends Binder {
@@ -237,12 +248,13 @@ public class PlayService extends Service implements MediaPlayer.OnCompletionList
         if(player == null){
             return ;
         }
-        if(ispause){
-            seekTo(getCurrentPosition());
+        if(!ispause){
             player.pause();
         }else{
+            seekTo(getCurrentPosition());
             player.start();
         }
+
     }
 
     public int  getDuration(){
@@ -276,16 +288,15 @@ public class PlayService extends Service implements MediaPlayer.OnCompletionList
 
     public int getSecondBar(){
         return sec * player.getDuration();
+
     }
 
 
     public void download(final String url){
         String filePath = Environment.getExternalStorageDirectory().getAbsolutePath()+"/duanzi_download"+"/"+url.substring(url.lastIndexOf("/") + 1);
-
         File file = new File(filePath);
         if(file.exists()){
-            Toast.makeText(this,"文件已存在",Toast.LENGTH_SHORT).show();
-
+            RxToast.info(this,"文件已存在",Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -293,15 +304,14 @@ public class PlayService extends Service implements MediaPlayer.OnCompletionList
             http.download(url,filePath , new RequestCallBack<File>() {
                 @Override
                 public void onSuccess(ResponseInfo<File> responseInfo) {
-                    Log.i("onSuccess", "download complete");
+                    //Log.i("onSuccess", "download complete");
                     Intent intentComplete = new Intent("download complete");
                     sendBroadcast(intentComplete);
-
                 }
 
                 @Override
                 public void onFailure(HttpException e, String s) {
-                    Log.i("DOWNLOAD", "download failed");
+                   // Log.i("DOWNLOAD", "download failed");
                     Intent intentFailure = new Intent("download failure");
                     sendBroadcast(intentFailure);
                 }
@@ -313,7 +323,7 @@ public class PlayService extends Service implements MediaPlayer.OnCompletionList
                     float percent = ((current * 1.0f / total)*100);
                     int progress = (int) percent;
                     intentUpdate.putExtra("progress",progress);
-                    Log.i("onLoading", "progress=="+progress);
+                   // Log.i("onLoading", "progress=="+progress);
                     sendBroadcast(intentUpdate);
                 }
             });
@@ -324,7 +334,7 @@ public class PlayService extends Service implements MediaPlayer.OnCompletionList
          notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         //创建NotificationChannel 适配8.0
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            NotificationChannel channel = new NotificationChannel(notificationStrId, notificationName, NotificationManager.IMPORTANCE_MIN);
+            NotificationChannel channel = new NotificationChannel(notificationStrId, notificationName, NotificationManager.IMPORTANCE_HIGH);
             notificationManager.createNotificationChannel(channel);
         }
         contentView = new RemoteViews(getPackageName(),
@@ -334,27 +344,33 @@ public class PlayService extends Service implements MediaPlayer.OnCompletionList
          contentView.setImageViewBitmap(R.id.normal_notification_image, BitmapFactory.decodeResource(getResources(),R.mipmap.fm));
          contentView.setTextViewText(R.id.normal_notification_title,fm.getTitle());
 
-         PendingIntent pauseIntent = PendingIntent.getBroadcast(this,1,new Intent("pause"),PendingIntent.FLAG_CANCEL_CURRENT);
-         contentView.setOnClickPendingIntent(R.id.normal_notification_stop,pauseIntent);
+         PendingIntent pauseIntent = PendingIntent.getBroadcast(this,1,new Intent("pause"),PendingIntent.FLAG_UPDATE_CURRENT);
+        contentView.setOnClickPendingIntent(R.id.normal_notification_stop,pauseIntent);
 
-        PendingIntent lastIntent = PendingIntent.getBroadcast(this,2,new Intent("last"),PendingIntent.FLAG_CANCEL_CURRENT);
+        PendingIntent lastIntent = PendingIntent.getBroadcast(this,2,new Intent("last"),PendingIntent.FLAG_UPDATE_CURRENT);
         contentView.setOnClickPendingIntent(R.id.normal_notification_last,lastIntent);
 
-        PendingIntent nextIntent = PendingIntent.getBroadcast(this,3,new Intent("next"),PendingIntent.FLAG_CANCEL_CURRENT);
+        PendingIntent nextIntent = PendingIntent.getBroadcast(this,3,new Intent("next"),PendingIntent.FLAG_UPDATE_CURRENT);
         contentView.setOnClickPendingIntent(R.id.normal_notification_next,nextIntent);
+
+        PendingIntent cancelIntent = PendingIntent.getBroadcast(this,4,new Intent("cancel"),PendingIntent.FLAG_CANCEL_CURRENT);
+        contentView.setOnClickPendingIntent(R.id.cancel_notification,cancelIntent);
 
         builder = new Notification.Builder(this)
                 .setSmallIcon(R.drawable.nopicture)
-                .setContentTitle("测试服务")
-                .setContentText("我正在运行");
+                .setContentTitle("FM")
+                .setContentText("段子来了");
 
 
         //设置Notification的ChannelID,否则不能正常显示
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             builder.setChannelId(notificationStrId);
         }
-        builder.setDefaults(Notification.FLAG_ONLY_ALERT_ONCE);
+       // builder.setDefaults(Notification.FLAG_ONLY_ALERT_ONCE);
+        builder.setOngoing(true);//设置通知栏不能通过滑动删除
         notification = builder.build();
+        notification.defaults= Notification.DEFAULT_SOUND;//设置声音
+
         notification.contentView = contentView;
         notificationManager.notify(id,notification);
     }
@@ -366,11 +382,9 @@ public class PlayService extends Service implements MediaPlayer.OnCompletionList
             NotificationChannel channel = new NotificationChannel(download_notificationStrId, download_notificationName, NotificationManager.IMPORTANCE_MIN);
             download_notificationManager.createNotificationChannel(channel);
         }
-        downContentView = new RemoteViews(getPackageName(),
-                R.layout.download_notification_layout);
-
+        downContentView = new RemoteViews(getPackageName(),R.layout.download_notification_layout);
         download_builder = new Notification.Builder(this)
-                .setSmallIcon(R.drawable.nopicture)
+                .setSmallIcon(R.mipmap.download)
                 .setContentTitle("下载任务")
                 .setContentText("我正在运行");
 
@@ -381,6 +395,8 @@ public class PlayService extends Service implements MediaPlayer.OnCompletionList
         }
         download_builder.setDefaults(Notification.FLAG_ONLY_ALERT_ONCE);
         download_notification = download_builder.build();
+        download_notification.defaults= Notification.DEFAULT_SOUND;//设置声音
+        download_notification.flags = Notification.FLAG_AUTO_CANCEL;//通知被点击后自动消失
         download_notification.contentView = downContentView;
         download_notificationManager.notify(down_id,download_notification);
     }
