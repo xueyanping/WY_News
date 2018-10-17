@@ -33,7 +33,7 @@ public class NetWorkUtils {
      */
     public static void openWirelessSettings(Context context) {
         if (android.os.Build.VERSION.SDK_INT > 10) {
-            context.startActivity(new Intent(android.provider.Settings.ACTION_SETTINGS));
+            context.startActivity(new Intent().setAction("android.settings.WIRELESS_SETTINGS"));
         } else {
             context.startActivity(new Intent(android.provider.Settings.ACTION_WIRELESS_SETTINGS));
         }

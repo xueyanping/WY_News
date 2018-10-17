@@ -2,10 +2,12 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/title_bar"
     android:layout_width="match_parent"
-    android:layout_height="50dp"
+    android:layout_height="60dp"
     android:background="@mipmap/titlebar_background"
     android:gravity="center_vertical"
+    android:layout_marginTop="15dp"
     android:orientation="horizontal" >
+
     <ImageButton
         android:id="@+id/btn_left_drawer"
         android:layout_width="55dp"

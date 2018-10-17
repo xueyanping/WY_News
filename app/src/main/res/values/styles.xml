@@ -45,5 +45,9 @@
         <item name="android:progressDrawable">@drawable/init_progressbar</item>
     </style>
 
+    <style name="settint_title">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">#ffffff</item>
+    </style>
 
 </resources>

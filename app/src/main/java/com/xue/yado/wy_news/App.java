@@ -5,6 +5,7 @@ import android.content.Context;
 
 import com.danikula.videocache.Cache;
 import com.danikula.videocache.HttpProxyCacheServer;
+import com.vondear.rxtools.RxTool;
 import com.xue.yado.wy_news.utils.CacheUtils;
 
 /**
@@ -14,6 +15,12 @@ import com.xue.yado.wy_news.utils.CacheUtils;
 public class App extends Application {
 
     private HttpProxyCacheServer proxy;
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        RxTool.init(this);
+    }
 
     public static HttpProxyCacheServer getProxy(Context context) {
         App app = (App) context.getApplicationContext();

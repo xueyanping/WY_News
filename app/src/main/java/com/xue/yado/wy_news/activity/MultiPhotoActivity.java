@@ -44,7 +44,7 @@ public class MultiPhotoActivity extends Activity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.multiphotoview);
+       setContentView(R.layout.multiphotoview);
         Intent intent = getIntent();
         initView();
         String url = intent.getStringExtra("url_json");
@@ -53,6 +53,8 @@ public class MultiPhotoActivity extends Activity{
        httpUtils(url);
 
     }
+
+
 
     private void initView() {
         back = findViewById(R.id.back);

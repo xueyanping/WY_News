@@ -42,11 +42,13 @@ dependencies {
     compile 'com.squareup.okhttp3:logging-interceptor:3.9.0'
     compile 'com.squareup.retrofit2:converter-scalars:2.3.0'
     //添加返回String的支持
-
     compile 'com.github.omadahealth:swipy:1.2.3@aar'
     compile 'com.scwang.smartrefresh:SmartRefreshLayout:1.0.4-4'
     //上拉刷新、下拉加载更多
     implementation files('libs/xUtils.jar')
     //缓存音频和视频
     compile 'com.danikula:videocache:2.7.0'
+    compile 'com.android.support:design:25.2.0'
+    compile 'de.hdodenhof:circleimageview:2.1.0'
+    implementation project(':RxTools-library')
 }

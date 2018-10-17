@@ -31,8 +31,10 @@ public class NewsContentActivity extends Activity implements View.OnClickListene
         initView();
         initData();
         clickEvent();
-   // Log.i( "onCreate: ","11"+title);
-}
+    // Log.i( "onCreate: ","11"+title);
+    }
+
+
 
     private void initView() {
         //tv_title = findViewById(R.id.tv_title);

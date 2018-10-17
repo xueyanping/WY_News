@@ -43,7 +43,7 @@ public class BaseViewHolder extends RecyclerView.ViewHolder {
     public <T extends View> T getView(int viewId) {
         View view = mViews.get(viewId);
         if (view == null) {
-            Log.i( "getView: ","viewId=="+viewId);
+          //  Log.i( "getView: ","viewId=="+viewId);
             view = mConvertView.findViewById(viewId);
             mViews.put(viewId, view);
         }
