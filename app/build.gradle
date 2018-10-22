@@ -48,7 +48,17 @@ dependencies {
     implementation files('libs/xUtils.jar')
     //缓存音频和视频
     compile 'com.danikula:videocache:2.7.0'
-    compile 'com.android.support:design:25.2.0'
+//    compile 'com.android.support:design:25.2.0'
     compile 'de.hdodenhof:circleimageview:2.1.0'
+    //butterknife
+    compile 'com.jakewharton:butterknife:8.2.1'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.2.1'
+
+    compile 'com.github.bumptech.glide:glide:3.7.0'
+    compile 'jp.wasabeef:glide-transformations:2.0.1'
+    compile 'com.android.support:recyclerview-v7:26.1.0'
+    compile 'com.android.support:cardview-v7:26.1.0'
+    compile 'com.yalantis:ucrop:2.2.0'
+
     implementation project(':RxTools-library')
 }

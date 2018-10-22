@@ -3,7 +3,6 @@ package com.xue.yado.wy_news.activity;
 import android.Manifest;
 import android.app.Dialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -18,7 +17,6 @@ import android.widget.Toast;
 
 import com.vondear.rxtools.view.RxToast;
 import com.xue.yado.wy_news.broadCast.NetBroadcastReceiver;
-import com.xue.yado.wy_news.newWork.NetConnectUtils;
 import com.xue.yado.wy_news.newWork.NetWorkUtils;
 
 
@@ -28,10 +26,9 @@ import static android.os.Build.VERSION_CODES.M;
  * Created by Administrator on 2018/10/16.
  */
 
-public abstract class BaseActivity extends AppCompatActivity implements NetBroadcastReceiver.netEvent{
+public abstract class BaseActivity extends AppCompatActivity implements NetBroadcastReceiver.netEventListener{
 
     private String[] PERMISSIONARRAY = {Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE};
-    public static NetBroadcastReceiver.netEvent event;
 
     private NetBroadcastReceiver receiver;
     private Dialog dialog;
@@ -41,8 +38,8 @@ public abstract class BaseActivity extends AppCompatActivity implements NetBroad
         super.onCreate(savedInstanceState);
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(getLayoutId());
-        event = this;
         receiver = new NetBroadcastReceiver();
+        receiver.setEventListener(this);
         IntentFilter filter = new IntentFilter();
         //filter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
         filter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
@@ -50,7 +47,6 @@ public abstract class BaseActivity extends AppCompatActivity implements NetBroad
         registerReceiver(receiver, filter);
         dialog = new Dialog(this);
         requestPermission();
-
     }
 
     public boolean isConnect(int netType){
@@ -80,7 +76,6 @@ public abstract class BaseActivity extends AppCompatActivity implements NetBroad
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 NetWorkUtils.openWirelessSettings(getApplicationContext());
-
                 //startActivity(new Intent().setAction("android.settings.WIRELESS_SETTINGS"));
             }
         });
@@ -89,7 +84,6 @@ public abstract class BaseActivity extends AppCompatActivity implements NetBroad
 
     private void requestPermission() {
         if(Build.VERSION.SDK_INT >= M){
-
             if(checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
                     || checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
 

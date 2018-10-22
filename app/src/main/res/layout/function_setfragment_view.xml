@@ -5,5 +5,5 @@
 <TextView
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:text="123"/>
+    android:text="功能设置"/>
 </LinearLayout>

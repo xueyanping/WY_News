@@ -80,18 +80,18 @@ public class SettingFragment extends android.support.v4.app.Fragment {
                 switch (item.getItemId()){
                     case R.id.my_navigation_0:
                         selectItem(0);
-                    break;
-
-                    case R.id.my_navigation_1:
-                        RxToast.info("夜间模式");
-                    break;
-
-                    case R.id.my_navigation_2:
-                        RxToast.info("关于");
-                        selectItem(1);
                         break;
 
+                    case R.id.my_navigation_1:
+                        selectItem(1);
+                    break;
+                    case R.id.my_navigation_2:
+                        RxToast.info("夜间模式");
+                        break;
                     case R.id.my_navigation_3:
+                        selectItem(3);
+                    break;
+                    case R.id.my_navigation_4:
                         android.os.Process.killProcess(android.os.Process.myPid());
                         System.exit(0);
                     break;
@@ -130,11 +130,16 @@ public class SettingFragment extends android.support.v4.app.Fragment {
     private Fragment getFragment(int pos) {
         switch (pos){
             case 0:
-                currentFragment = new HomeFragment();
+                currentFragment = new Setting_MainFragment();
                 break;
             case 1:
-                currentFragment = new ExitFragment();
+                currentFragment = new Function_SetFragment();
                 break;
+
+            case 3:
+                currentFragment = new About_Fragment();
+                break;
+
         }
         return currentFragment;
     }

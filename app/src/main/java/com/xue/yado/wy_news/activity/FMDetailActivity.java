@@ -6,7 +6,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 
-import android.content.IntentFilter;
+
 import android.content.ServiceConnection;
 
 import android.os.Build;
@@ -19,9 +19,7 @@ import android.support.annotation.RequiresApi;
 
 import android.view.Gravity;
 import android.view.View;
-import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
+
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -39,6 +37,9 @@ import com.xue.yado.wy_news.service.PlayService;
 
 import java.text.SimpleDateFormat;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 
 /**
@@ -48,12 +49,45 @@ import java.text.SimpleDateFormat;
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class FMDetailActivity extends Activity implements View.OnClickListener,SeekBar.OnSeekBarChangeListener {
 
-    private ImageView back,menu,image,last,next,ILike,playtime,sharetime;
-    private ImageView stop;
-    private TextView title;
-    private SeekBar seekBar;
-    private TextView currenttime,maxtime,ILike_times,playtimes,sharetimes;
-    //private boolean isPause = false ;
+    @BindView(R.id.image)
+     ImageView image;
+    @BindView(R.id.ILike)
+     ImageView ILike;
+    @BindView(R.id.playtime)
+     ImageView playtime;
+    @BindView(R.id.sharetime)
+     ImageView sharetime;
+    @BindView(R.id.ILike_times)
+     TextView ILike_times;
+    @BindView(R.id.sharetimes)
+     TextView sharetimes;
+
+    @BindView(R.id.seekbar)
+     SeekBar seekBar;
+    @BindView(R.id.currenttime)
+    TextView currenttime;
+    @BindView(R.id.playtimes)
+     TextView playtimes;
+    @BindView(R.id.maxtime)
+    TextView maxtime;
+
+    @BindView(R.id.back)
+     ImageView back;
+    @BindView(R.id.popwindowmenu)
+     ImageView menu;
+    @BindView(R.id.stop)
+     ImageView stop;
+    @BindView(R.id.last)
+     ImageView last;
+    @BindView(R.id.next)
+     ImageView next;
+    @BindView(R.id.title)
+    TextView title;
+
+
+
+
+
     private boolean isbind = false;
     private FM.DataBean.ListBean fm;
     Intent intent ;
@@ -63,8 +97,10 @@ public class FMDetailActivity extends Activity implements View.OnClickListener,S
     private CustomPopupWindow popupWindow;
     private GoodView goodView;
     private static boolean isZaned;
-    PlayService.NotificationBroadcastReceiver notificationbroadcastreceiver;
+    private boolean isLocal;
+    //格式化时间为 分:秒
     SimpleDateFormat time = new SimpleDateFormat("mm:ss");
+
     //使用ServiceConnection来监听Service状态的变化
     private ServiceConnection conn = new ServiceConnection() {
 
@@ -76,13 +112,20 @@ public class FMDetailActivity extends Activity implements View.OnClickListener,S
 
         @Override
         public void onServiceConnected(ComponentName name, IBinder binder) {
-            //这里我们实例化PlayService,通过binder来实现
+            //实例化PlayService,通过binder来实现
             if(service == null) {
                 service = ((PlayService.AudioBinder) binder).getService();
-                IntentFilter filter = new IntentFilter();
-                filter.addAction("pause");
-                notificationbroadcastreceiver = service.new NotificationBroadcastReceiver();
-                registerReceiver(notificationbroadcastreceiver, filter);
+                service.setPlayerListener(new PlayListener() {
+                    @Override
+                    public void onPlayPause() {
+                        if(PlayService.isPause){
+                            stop.setImageResource(R.mipmap.stop);
+                        }else{
+                            stop.setImageResource(R.mipmap.bofang);
+                        }
+                    }
+                });
+
                 maxtime.setText(time.format(service.getDuration()));
                 isbind = true;
                 if(isbind){
@@ -97,7 +140,7 @@ public class FMDetailActivity extends Activity implements View.OnClickListener,S
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fmdetail);
-        goodView = new GoodView(this);
+        ButterKnife.bind(this);
         initView();
         initClick();
         new Thread(new Runnable() {
@@ -113,28 +156,18 @@ public class FMDetailActivity extends Activity implements View.OnClickListener,S
     private void initView() {
         Intent i = getIntent();
         fm = (FM.DataBean.ListBean) i.getSerializableExtra("fm");
-        image = findViewById(R.id.image);
-        ILike = findViewById(R.id.ILike);
-        playtime = findViewById(R.id.playtime);
-        sharetime = findViewById(R.id.sharetime);
 
-        ILike_times = findViewById(R.id.ILike_times);
-        sharetimes = findViewById(R.id.sharetimes);
-        playtimes = findViewById(R.id.playtimes);
-        seekBar = findViewById(R.id.seekbar);
-        currenttime = findViewById(R.id.currenttime);
-        maxtime = findViewById(R.id.maxtime);
-        back = findViewById(R.id.back);
-        menu = findViewById(R.id.popwindowmenu);
-        stop = findViewById(R.id.stop);
-        last = findViewById(R.id.last);
-        next = findViewById(R.id.next);
-        title = findViewById(R.id.title);
-        new BitmapUtils(this).display(image,fm.getCoverMiddle());
         title.setText(fm.getTitle());
-        playtimes.setText(fm.getPlaytimes()+"");
-        sharetimes.setText(fm.getShares()+"");
-        ILike_times.setText(fm.getLikes()+"");
+
+        if(!isLocal){
+            new BitmapUtils(this).display(image,fm.getCoverMiddle());
+            goodView = new GoodView(this);
+            playtimes.setText(fm.getPlaytimes()+"");
+            sharetimes.setText(fm.getShares()+"");
+            ILike_times.setText(fm.getLikes()+"");
+        }else{
+            image.setImageResource(R.drawable.nopicture);
+        }
     }
 
     Runnable runnable = new Runnable() {
@@ -156,10 +189,9 @@ public class FMDetailActivity extends Activity implements View.OnClickListener,S
        intent.putExtra("fm",fm);
        startService(intent);
        if(!isbind){
+           PlayService.isPause = false;
            bindService(intent, conn, Context.BIND_AUTO_CREATE);
        }
-       PlayService.isPause = false;
-
     }
 
 
@@ -170,23 +202,18 @@ public class FMDetailActivity extends Activity implements View.OnClickListener,S
         last.setOnClickListener(this);
         next.setOnClickListener(this);
         seekBar.setOnSeekBarChangeListener(this);
-        ILike.setOnClickListener(this);
-        sharetime.setOnClickListener(this);
-        playtime.setOnClickListener(this);
-
-
-
-
+        if(!isLocal){
+            ILike.setOnClickListener(this);
+            sharetime.setOnClickListener(this);
+            playtime.setOnClickListener(this);
+        }
     }
 
     @Override
     public void onClick(View v) {
-
         intent.setClass(this,PlayService.class);
         switch (v.getId()){
             case R.id.back:
-//                stopService(intent);
-//                unbindService(conn);
                 this.finish();
                 break;
             case R.id.popwindowmenu:
@@ -198,11 +225,13 @@ public class FMDetailActivity extends Activity implements View.OnClickListener,S
                 if(PlayService.isPause){
                     stop.setImageResource(R.mipmap.stop);
                     service.playOrStop(PlayService.isPause);
+                    service.changeImage( PlayService.isPause);
                     PlayService.isPause=false;
                 }else{
                     stop.setImageResource(R.mipmap.bofang);
                     service.playOrStop(PlayService.isPause);
-                    PlayService.isPause = true;
+                    service.changeImage( PlayService.isPause);
+                   PlayService.isPause = true;
                 }
 
                 break;
@@ -307,7 +336,7 @@ public class FMDetailActivity extends Activity implements View.OnClickListener,S
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(notificationbroadcastreceiver);
+
     }
 
 

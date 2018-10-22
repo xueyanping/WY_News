@@ -7,7 +7,6 @@ import android.net.ConnectivityManager;
 import android.util.Log;
 
 import com.xue.yado.wy_news.activity.BaseActivity;
-import com.xue.yado.wy_news.newWork.NetConnectUtils;
 import com.xue.yado.wy_news.newWork.NetWorkUtils;
 
 
@@ -16,8 +15,8 @@ import com.xue.yado.wy_news.newWork.NetWorkUtils;
  */
 
 public class NetBroadcastReceiver extends BroadcastReceiver {
+    netEventListener event;
 
-        netEvent event = BaseActivity.event;
     @Override
     public void onReceive(Context context, Intent intent) {
         //若相等则网络状态发生变化
@@ -29,9 +28,12 @@ public class NetBroadcastReceiver extends BroadcastReceiver {
 
     }
 
-    public interface netEvent{
+    public interface netEventListener{
         void onNetChange(int netType);
     }
 
+    public void setEventListener(netEventListener event){
+        this.event = event;
+    }
 
 }

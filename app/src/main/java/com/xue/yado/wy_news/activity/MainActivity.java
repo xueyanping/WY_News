@@ -1,38 +1,32 @@
 package com.xue.yado.wy_news.activity;
 
-
-
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-
 import android.os.Bundle;
-
-
-import android.widget.RadioButton;
 import android.widget.RadioGroup;
-
-
 import java.util.ArrayList;
 import java.util.List;
-
-
 import com.xue.yado.wy_news.R;
 import com.xue.yado.wy_news.fragment.*;
+import com.xue.yado.wy_news.myView.ContentViewPager;
 
-
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 public class MainActivity extends BaseActivity{
 
-    private ViewPager viewPager;
-    private RadioGroup radioGroup;
-    private RadioButton rb_xinwen,rb_FM,rb_Music,rb_Setting;
+    @BindView(R.id.viewpager)
+    ContentViewPager viewPager;
+    @BindView(R.id.content_radiogroup)
+     RadioGroup radioGroup;
     private List<Fragment> fragmentList;
     private FragmentPagerAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ButterKnife.bind(this);
         initView();
     }
 
@@ -43,17 +37,10 @@ public class MainActivity extends BaseActivity{
     }
 
     private void initView() {
-        viewPager = findViewById(R.id.viewpager);
-        radioGroup = findViewById(R.id.content_radiogroup);
-        rb_xinwen = findViewById(R.id.rb_xinwen);
-        rb_FM = findViewById(R.id.rb_FM);
-        rb_Music = findViewById(R.id.rb_Music);
-        rb_Setting = findViewById(R.id.rb_Setting);
 
         fragmentList = new ArrayList<>();
         fragmentList.add(new XinWenFragment());
         fragmentList.add(new FMFragment());
-        fragmentList.add(new MusicFragment());
         fragmentList.add(new SettingFragment());
 
         adapter = new FragmentPagerAdapter(getSupportFragmentManager()) {
@@ -67,7 +54,7 @@ public class MainActivity extends BaseActivity{
                 return fragmentList.size();
             }
         };
-    viewPager.setOffscreenPageLimit(4);
+    viewPager.setOffscreenPageLimit(3);
     viewPager.setAdapter(adapter);
     viewPager.setCurrentItem(0);
 
@@ -81,11 +68,8 @@ public class MainActivity extends BaseActivity{
                 case R.id.rb_FM:
                     viewPager.setCurrentItem(1);
                     break;
-                case R.id.rb_Music:
-                    viewPager.setCurrentItem(2);
-                    break;
                 case R.id.rb_Setting:
-                    viewPager.setCurrentItem(3);
+                    viewPager.setCurrentItem(2);
                     break;
             }
         }

@@ -73,22 +73,30 @@ public class PlayService extends Service implements MediaPlayer.OnCompletionList
 
     Uri uri;
     private final IBinder binder = (IBinder) new AudioBinder();
-    int sec;
-    public static boolean isPause;
-    boolean isCached = false;
+
+    int sec; //缓存百分比
+    public static boolean isPause;//是否已暂停
+    boolean isCached = false;//是否缓存完毕
     FM.DataBean.ListBean fm;
-    String url;
-    private static final String notificationStrId = "1",notificationName = "2",download_notificationStrId = "01",download_notificationName = "02";
-    private static final int id = 5;
-    private static final int down_id = 6;
+    String url;//播放的网络路径
+
+    private static final String notificationStrId = "FM";
+    private static final String notificationName = "NOTIFICATION_NAME";
+    private static final String download_notificationStrId = "FM_DOWNLOAD";
+    private static final String download_notificationName = "DOWNLOAD_NOTIFICATION_NAME";
+    private static final int ID = 5;
+    private static final int DOWNLOAD_ID = 6;
     RemoteViews contentView,downContentView;
     Notification.Builder builder,download_builder;
     Notification notification,download_notification;
     NotificationBroadcastReceiver notificationbroadcastreceiver;
 
     NotificationManager notificationManager,download_notificationManager;
+    PlayListener listener;
 
-
+    public void setPlayerListener(PlayListener listener){
+        this.listener = listener;
+    }
 
     public  class NotificationBroadcastReceiver extends BroadcastReceiver
     {
@@ -98,34 +106,36 @@ public class PlayService extends Service implements MediaPlayer.OnCompletionList
             switch (str){
                 case "download complete":
                     downContentView.setTextViewText(R.id.download_notificationTitle,"下载完成 点击查看");
-                    download_notificationManager.notify(down_id,download_notification);
+                    download_notificationManager.notify(DOWNLOAD_ID,download_notification);
                     break;
                 case "download updating":
                     getDownloadNotification();
                     downContentView.setTextViewText(R.id.download_notificationTitle,"正在下载");
                     downContentView.setTextViewText(R.id.download_notificationPercent, intent.getIntExtra("progress",0)+"%");
                     downContentView.setProgressBar(R.id.download_notificationProgress,100, intent.getIntExtra("progress",0),false);
-
-                    download_notificationManager.notify(down_id,download_notification);
+                    download_notificationManager.notify(DOWNLOAD_ID,download_notification);
                     break;
                 case "download failure":
                     downContentView.setTextViewText(R.id.download_notificationTitle,"下载失败 点击返回");
 //                    PendingIntent pendingIntent = PendingIntent.getService(PlayService.this,0x11,new Intent(PlayService.this,this.getClass()),PendingIntent.FLAG_CANCEL_CURRENT);
 //                    notification.contentIntent = pendingIntent;
-                    download_notificationManager.cancel(down_id);
+                    download_notificationManager.cancel(DOWNLOAD_ID);
                     break;
                 case "pause":
+                  Log.i( "onReceive: ","PlayService.isPause="+PlayService.isPause);
                     if(PlayService.isPause){
                         contentView.setImageViewBitmap(R.id.normal_notification_stop, BitmapFactory.decodeResource(getResources(),R.mipmap.stop));
                         playOrStop(PlayService.isPause);
+                        listener.onPlayPause();
                         PlayService.isPause = false;
-
                     }else{
                         contentView.setImageViewBitmap(R.id.normal_notification_stop, BitmapFactory.decodeResource(getResources(),R.mipmap.bofang));
                         playOrStop(PlayService.isPause);
+                        listener.onPlayPause();
                         PlayService.isPause = true;
                     }
-                    notificationManager.notify(id,notification);
+
+                    notificationManager.notify(ID,notification);
                     break;
 
                 case "next":
@@ -135,14 +145,12 @@ public class PlayService extends Service implements MediaPlayer.OnCompletionList
                     tui();
                     break;
                 case "cancel":
-                    notificationManager.cancel(id);
+                    notificationManager.cancel(ID);
                     break;
                 }
         }
 
     }
-
-
 
 
     @Override
@@ -226,8 +234,7 @@ public class PlayService extends Service implements MediaPlayer.OnCompletionList
     @Override
     public void onCacheAvailable(File cacheFile, String url, int percentsAvailable) {
         setsecondBar(percentsAvailable);
-               // Log.i( "onCacheAvailable: ","1111111111"+percentsAvailable);
-
+        // Log.i( "onCacheAvailable: ","1111111111"+percentsAvailable);
         if(percentsAvailable == 100){
             isCached = true;
             return ;
@@ -257,12 +264,21 @@ public class PlayService extends Service implements MediaPlayer.OnCompletionList
 
     }
 
+    public void changeImage(boolean ispause){
+        if(!ispause){
+            contentView.setImageViewBitmap(R.id.normal_notification_stop, BitmapFactory.decodeResource(getResources(),R.mipmap.bofang));
+        }else{
+            contentView.setImageViewBitmap(R.id.normal_notification_stop, BitmapFactory.decodeResource(getResources(),R.mipmap.stop));
+
+        }
+        notificationManager.notify(ID,notification);
+    }
+
     public int  getDuration(){
         return player.getDuration();
     }
 
     public int  getCurrentPosition(){
-       // Log.i( "getCurrentPosition: ","player.getCurrentPosition()="+player.getCurrentPosition());
         return player.getCurrentPosition();
     }
 
@@ -276,10 +292,10 @@ public class PlayService extends Service implements MediaPlayer.OnCompletionList
     }
 
     public void tui(){
-        player.seekTo(player.getCurrentPosition()-15*1000);
+        player.seekTo(player.getCurrentPosition() - 15*1000);
     }
     public void jin(){
-        player.seekTo(player.getCurrentPosition()+15*1000);
+        player.seekTo(player.getCurrentPosition() + 15*1000);
     }
 
     public void setsecondBar(int sec){
@@ -288,12 +304,13 @@ public class PlayService extends Service implements MediaPlayer.OnCompletionList
 
     public int getSecondBar(){
         return sec * player.getDuration();
-
     }
 
-
+    //音频下载
     public void download(final String url){
-        String filePath = Environment.getExternalStorageDirectory().getAbsolutePath()+"/duanzi_download"+"/"+url.substring(url.lastIndexOf("/") + 1);
+        String filePath = Environment.getExternalStorageDirectory().getAbsolutePath()+"/duanzi_download"+"/"+fm.getTitle()+".mp3";
+       // String path = url.substring(url.lastIndexOf("/") + 1);
+
         File file = new File(filePath);
         if(file.exists()){
             RxToast.info(this,"文件已存在",Toast.LENGTH_SHORT).show();
@@ -331,21 +348,22 @@ public class PlayService extends Service implements MediaPlayer.OnCompletionList
 
 
     private void getNotification() {
+
          notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         //创建NotificationChannel 适配8.0
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
             NotificationChannel channel = new NotificationChannel(notificationStrId, notificationName, NotificationManager.IMPORTANCE_HIGH);
             notificationManager.createNotificationChannel(channel);
         }
-        contentView = new RemoteViews(getPackageName(),
-                R.layout.normal_notification);
 
+        contentView = new RemoteViews(getPackageName(),R.layout.normal_notification);
+        contentView.setImageViewBitmap(R.id.normal_notification_stop, BitmapFactory.decodeResource(getResources(),R.mipmap.stop));
+        contentView.setImageViewBitmap(R.id.normal_notification_image, BitmapFactory.decodeResource(getResources(),R.mipmap.fm));
+        contentView.setTextViewText(R.id.normal_notification_title,fm.getTitle());
 
-         contentView.setImageViewBitmap(R.id.normal_notification_image, BitmapFactory.decodeResource(getResources(),R.mipmap.fm));
-         contentView.setTextViewText(R.id.normal_notification_title,fm.getTitle());
 
          PendingIntent pauseIntent = PendingIntent.getBroadcast(this,1,new Intent("pause"),PendingIntent.FLAG_UPDATE_CURRENT);
-        contentView.setOnClickPendingIntent(R.id.normal_notification_stop,pauseIntent);
+         contentView.setOnClickPendingIntent(R.id.normal_notification_stop,pauseIntent);
 
         PendingIntent lastIntent = PendingIntent.getBroadcast(this,2,new Intent("last"),PendingIntent.FLAG_UPDATE_CURRENT);
         contentView.setOnClickPendingIntent(R.id.normal_notification_last,lastIntent);
@@ -366,13 +384,12 @@ public class PlayService extends Service implements MediaPlayer.OnCompletionList
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             builder.setChannelId(notificationStrId);
         }
-       // builder.setDefaults(Notification.FLAG_ONLY_ALERT_ONCE);
+
         builder.setOngoing(true);//设置通知栏不能通过滑动删除
         notification = builder.build();
         notification.defaults= Notification.DEFAULT_SOUND;//设置声音
-
         notification.contentView = contentView;
-        notificationManager.notify(id,notification);
+        notificationManager.notify(ID,notification);
     }
 
     private void getDownloadNotification() {
@@ -398,7 +415,7 @@ public class PlayService extends Service implements MediaPlayer.OnCompletionList
         download_notification.defaults= Notification.DEFAULT_SOUND;//设置声音
         download_notification.flags = Notification.FLAG_AUTO_CANCEL;//通知被点击后自动消失
         download_notification.contentView = downContentView;
-        download_notificationManager.notify(down_id,download_notification);
+        download_notificationManager.notify(DOWNLOAD_ID,download_notification);
     }
 }
 

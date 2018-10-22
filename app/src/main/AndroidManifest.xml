@@ -44,6 +44,7 @@
         <activity android:name=".activity.NewsContentActivity" />
         <activity android:name=".activity.MultiPhotoActivity" />
         <activity android:name=".activity.FMDetailActivity" />
+        <activity android:name=".activity.MusicListActivity"></activity>
     </application>
 
 </manifest>

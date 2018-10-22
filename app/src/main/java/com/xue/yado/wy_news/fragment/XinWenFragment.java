@@ -23,6 +23,8 @@ import com.xue.yado.wy_news.R;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 
 /**
@@ -31,13 +33,24 @@ import java.util.List;
 
 public class XinWenFragment extends android.support.v4.app.Fragment {
 
-    private ViewPager xinwen_viewpager;
-    private List<Fragment> list_frag;
+    @BindView(R.id.xinwen_viewpager)
+    ViewPager xinwen_viewpager;
 
+    @BindView(R.id.xinwen_radiogroup)
+    RadioGroup radioGroup;
+
+    @BindView(R.id.xinwen_rb1)
+    RadioButton xinwen_rb1;
+
+    @BindView(R.id.xinwen_indicator)
+    TextView xinwen_indicator;
+
+    @BindView(R.id.txt_title)
+    TextView txt_title;
+
+    private List<Fragment> list_frag;
     View view;
-    private RadioGroup radioGroup;
-    private RadioButton xinwen_rb1,xinwen_rb2,xinwen_rb3,xinwen_rb4;
-    private TextView xinwen_indicator;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         initData();
@@ -72,14 +85,8 @@ public class XinWenFragment extends android.support.v4.app.Fragment {
     }
 
     private void initView() {
-        xinwen_viewpager = view.findViewById(R.id.xinwen_viewpager);
-        radioGroup = view.findViewById(R.id.xinwen_radiogroup);
-        xinwen_rb1 = view.findViewById(R.id.xinwen_rb1);
-        xinwen_rb2 = view.findViewById(R.id.xinwen_rb2);
-        xinwen_rb3 = view.findViewById(R.id.xinwen_rb3);
-        xinwen_rb4 = view.findViewById(R.id.xinwen_rb4);
+        txt_title.setText("天下新闻");
         xinwen_rb1.setChecked(true);
-        xinwen_indicator = view.findViewById(R.id.xinwen_indicator);
         xinwen_viewpager.setAdapter(new FragmentPagerAdapter(getActivity().getSupportFragmentManager()) {
             @Override
             public Fragment getItem(int position) {
@@ -101,7 +108,9 @@ public class XinWenFragment extends android.support.v4.app.Fragment {
                 WindowManager wm = (WindowManager) getActivity().getSystemService(Context.WINDOW_SERVICE);
                 DisplayMetrics dm = new DisplayMetrics();
                 wm.getDefaultDisplay().getMetrics(dm);
-                int width = dm.widthPixels/radioGroup.getChildCount();         // 屏幕宽度（像素）
+                int windowWidth = dm.widthPixels; // 屏幕宽度（像素）
+
+                int width = windowWidth/radioGroup.getChildCount();
                 LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) xinwen_indicator
                         .getLayoutParams();
 
@@ -111,7 +120,6 @@ public class XinWenFragment extends android.support.v4.app.Fragment {
 
             @Override
             public void onPageSelected(int position) {
-
                 RadioButton rb = (RadioButton) radioGroup.getChildAt(position);
                 rb.setChecked(true);
                 xinwen_viewpager.setCurrentItem(position);
@@ -127,7 +135,6 @@ public class XinWenFragment extends android.support.v4.app.Fragment {
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-
                 //选中的RadioButton播放动画
                 ScaleAnimation sAnim = new ScaleAnimation(1, 1.1f, 1, 1.1f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
                 sAnim.setDuration(500);
@@ -162,6 +169,7 @@ public class XinWenFragment extends android.support.v4.app.Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
          view = inflater.inflate(R.layout.xinwen_view,container,false);
+         ButterKnife.bind(this,view);
          initView();
         return view;
     }
