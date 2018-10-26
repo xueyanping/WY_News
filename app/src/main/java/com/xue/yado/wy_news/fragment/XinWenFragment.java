@@ -85,7 +85,7 @@ public class XinWenFragment extends android.support.v4.app.Fragment {
     }
 
     private void initView() {
-        txt_title.setText("天下新闻");
+        txt_title.setText("新闻资讯");
         xinwen_rb1.setChecked(true);
         xinwen_viewpager.setAdapter(new FragmentPagerAdapter(getActivity().getSupportFragmentManager()) {
             @Override

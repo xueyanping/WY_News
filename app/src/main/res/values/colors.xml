@@ -6,4 +6,9 @@
     <color name="grey_900">#414141</color>
     <item name="gray_holo_light" type="color">#ffd0d0d0</item>
     <color name="red_f">#ff3c00</color>
+
+    <color name="colorPrimaryNight">#263238</color>
+    <color name="colorPrimaryDarkNight">#1E282D</color>
+    <color name="colorAccentNight">#73432A</color>
+
 </resources>

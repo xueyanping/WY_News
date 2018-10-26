@@ -37,7 +37,6 @@ public class NewsContentActivity extends Activity implements View.OnClickListene
 
 
     private void initView() {
-        //tv_title = findViewById(R.id.tv_title);
         back = findViewById(R.id.back);
         webView = findViewById(R.id.webview);
     }

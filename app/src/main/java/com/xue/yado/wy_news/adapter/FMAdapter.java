@@ -1,4 +1,4 @@
-package com.xue.yado.wy_news.myView;
+package com.xue.yado.wy_news.adapter;
 
 import android.content.Context;
 import android.widget.ImageView;
@@ -6,6 +6,7 @@ import android.widget.ImageView;
 import com.lidroid.xutils.BitmapUtils;
 import com.xue.yado.wy_news.R;
 import com.xue.yado.wy_news.bean.FM;
+import com.xue.yado.wy_news.myView.BaseViewHolder;
 
 /**
  * Created by Administrator on 2018/9/26.

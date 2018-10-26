@@ -1,12 +1,13 @@
 package com.xue.yado.wy_news.bean;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * Created by Administrator on 2018/9/6.
  */
 
-public class Toutiao {
+public class Toutiao implements Serializable {
 
 
     private List<T1348647853363Bean> T1348647853363;

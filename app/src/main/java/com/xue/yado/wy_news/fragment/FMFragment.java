@@ -1,8 +1,6 @@
 package com.xue.yado.wy_news.fragment;
 
 import android.content.Intent;
-import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -24,12 +22,10 @@ import com.lidroid.xutils.http.client.HttpRequest;
 import com.xue.yado.wy_news.R;
 import com.xue.yado.wy_news.activity.FMDetailActivity;
 import com.xue.yado.wy_news.bean.FM;
-import com.xue.yado.wy_news.myView.FMAdapter;
-import com.xue.yado.wy_news.myView.FMRecyclerAdapter;
+import com.xue.yado.wy_news.adapter.FMAdapter;
+import com.xue.yado.wy_news.adapter.FMRecyclerAdapter;
+import com.xue.yado.wy_news.utils.SharedPreferenceUtil;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,7 +47,7 @@ public class FMFragment extends android.support.v4.app.Fragment  {
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
-        getData();
+
         super.onCreate(savedInstanceState);
     }
 
@@ -59,6 +55,12 @@ public class FMFragment extends android.support.v4.app.Fragment  {
     public View onCreateView(LayoutInflater inflater,ViewGroup container,Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.redian_view,container,false);
         initView(view);
+        if(SharedPreferenceUtil.getData(getContext(),URL)!=null){
+            Log.i("onNext: ", "SharedPreferenceUtilFM:=== "+SharedPreferenceUtil.getData(getContext(),URL));
+            paraseJson(SharedPreferenceUtil.getData(getContext(),URL));
+        }else{
+            getData();
+        }
         return view;
     }
 
@@ -109,14 +111,9 @@ public class FMFragment extends android.support.v4.app.Fragment  {
         http.send(HttpRequest.HttpMethod.GET,URL, new RequestCallBack<String>(){
             @Override
             public void onSuccess(ResponseInfo<String> responseInfo) {
-               // Log.i( "onSuccess: ","result=="+responseInfo.result);
-                Gson gson = new Gson();
-                fm = gson.fromJson(responseInfo.result, FM.class);
-                fmList = (ArrayList<FM.DataBean.ListBean>) fm.getData().getList();
-                if(fmList.size()>0){
-                    adapter.clearDatas();
-                    adapter.addDatas(fmList);
-                }
+                Log.i( "onSuccess: ","result=="+responseInfo.result);
+                SharedPreferenceUtil.saveData(getContext(),URL,responseInfo.result);
+                paraseJson(responseInfo.result);
 
             }
 
@@ -125,6 +122,17 @@ public class FMFragment extends android.support.v4.app.Fragment  {
                 Log.i("onFailure", "onFailure: ");
             }
         });
+    }
+
+    private void paraseJson(String result) {
+        Gson gson = new Gson();
+        fm = gson.fromJson(result, FM.class);
+        fmList = (ArrayList<FM.DataBean.ListBean>) fm.getData().getList();
+        if(fmList.size()>0){
+            adapter.clearDatas();
+            adapter.addDatas(fmList);
+        }
+
     }
 
 }

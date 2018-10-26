@@ -1,12 +1,10 @@
 package com.xue.yado.wy_news.fragment;
 
 import android.os.Bundle;
-
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
@@ -22,27 +20,33 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.Toast;
-
 
 import com.vondear.rxtools.view.RxToast;
 import com.xue.yado.wy_news.R;
-import com.xue.yado.wy_news.activity.MainActivity;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 /**
  * Created by Administrator on 2018/9/12.
  */
 
 public class SettingFragment extends android.support.v4.app.Fragment {
-    private DrawerLayout drawer_layout;
-    private FrameLayout fl_container;
-    private NavigationView navigation_view;
-    private Toolbar toolbar;
+    @BindView(R.id.drawer_layout)
+     DrawerLayout drawer_layout;
+    @BindView(R.id.fl_container)
+     FrameLayout fl_container;
+    @BindView(R.id.navigation_view)
+     NavigationView navigation_view;
+    @BindView(R.id.toolbar)
+     Toolbar toolbar;
+
     private Fragment currentFragment;
     private int currentPos = -1;
     @Override
     public View onCreateView(LayoutInflater inflater,ViewGroup container,Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.shezhi_view,container,false);
+        ButterKnife.bind(this,view);
         initViews(view);
         initEvents();
         ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(getActivity(), drawer_layout, toolbar, 0, 0);
@@ -58,10 +62,7 @@ public class SettingFragment extends android.support.v4.app.Fragment {
     }
 
     private void initViews(View view) {
-        drawer_layout = view.findViewById(R.id.drawer_layout);
-        fl_container = view.findViewById(R.id.fl_container);
-        navigation_view = view.findViewById(R.id.navigation_view);
-        toolbar = view.findViewById(R.id.toolbar);
+
         setHasOptionsMenu(true);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         ActionBar actionBar=((AppCompatActivity) getActivity()).getSupportActionBar();
@@ -83,6 +84,7 @@ public class SettingFragment extends android.support.v4.app.Fragment {
                         break;
 
                     case R.id.my_navigation_1:
+                       // startActivity(new Intent(getContext(), TextSizeShowActivity.class));
                         selectItem(1);
                     break;
                     case R.id.my_navigation_2:

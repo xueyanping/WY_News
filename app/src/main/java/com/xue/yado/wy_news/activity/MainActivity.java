@@ -1,15 +1,18 @@
 package com.xue.yado.wy_news.activity;
 
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.ViewPager;
-import android.os.Bundle;
 import android.widget.RadioGroup;
+
+import com.xue.yado.wy_news.R;
+import com.xue.yado.wy_news.fragment.FMFragment;
+import com.xue.yado.wy_news.fragment.SettingFragment;
+import com.xue.yado.wy_news.fragment.XinWenFragment;
+import com.xue.yado.wy_news.myView.ContentViewPager;
+
 import java.util.ArrayList;
 import java.util.List;
-import com.xue.yado.wy_news.R;
-import com.xue.yado.wy_news.fragment.*;
-import com.xue.yado.wy_news.myView.ContentViewPager;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

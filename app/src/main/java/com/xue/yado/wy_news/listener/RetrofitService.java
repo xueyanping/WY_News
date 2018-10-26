@@ -1,4 +1,4 @@
-package com.xue.yado.wy_news.service;
+package com.xue.yado.wy_news.listener;
 
 import io.reactivex.Observable;
 import retrofit2.http.GET;

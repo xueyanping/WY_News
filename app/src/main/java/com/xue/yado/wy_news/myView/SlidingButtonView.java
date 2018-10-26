@@ -37,19 +37,16 @@ public class SlidingButtonView extends HorizontalScrollView {
 
     public SlidingButtonView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-
         this.setOverScrollMode(OVER_SCROLL_NEVER);
     }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-
         if(!once){
             mTextView_Delete = (TextView) findViewById(R.id.tv_delete);
             once = true;
         }
-
     }
 
     @Override
@@ -127,8 +124,6 @@ public class SlidingButtonView extends HorizontalScrollView {
         this.smoothScrollTo(0, 0);
         isOpen = false;
     }
-
-
 
 
     public void setSlidingButtonListener(IonSlidingButtonListener listener){

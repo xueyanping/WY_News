@@ -1,4 +1,4 @@
-package com.xue.yado.wy_news.myView;
+package com.xue.yado.wy_news.adapter;
 
 /**
  * Created by Administrator on 2018/9/7.

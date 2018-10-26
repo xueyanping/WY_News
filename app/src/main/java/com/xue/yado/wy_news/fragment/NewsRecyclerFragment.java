@@ -1,11 +1,8 @@
 package com.xue.yado.wy_news.fragment;
 
 import android.content.Intent;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.view.PagerAdapter;
@@ -14,24 +11,19 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
 import com.lidroid.xutils.BitmapUtils;
 import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.exception.HttpException;
 import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.lidroid.xutils.http.client.HttpRequest;
-import com.lidroid.xutils.util.LogUtils;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.listener.OnLoadmoreListener;
@@ -42,12 +34,11 @@ import com.xue.yado.wy_news.bean.Toutiao;
 
 import com.xue.yado.wy_news.listener.ObservableOnNextListener;
 
-import com.xue.yado.wy_news.myView.MyRecyclerAdapter;
-import com.xue.yado.wy_news.myView.NewsAdapter;
+import com.xue.yado.wy_news.adapter.MyRecyclerAdapter;
+import com.xue.yado.wy_news.adapter.NewsAdapter;
 import com.xue.yado.wy_news.newWork.MyObservable;
-import com.xue.yado.wy_news.newWork.MyRetrofit;
 import com.xue.yado.wy_news.newWork.RetrofitMethods;
-import com.xue.yado.wy_news.service.RetrofitService;
+import com.xue.yado.wy_news.utils.SharedPreferenceUtil;
 import com.xue.yado.wy_news.utils.XinWenJson;
 
 import org.json.JSONArray;
@@ -56,8 +47,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import retrofit2.Retrofit;
 
 /**
  * Created by Administrator on 2018/9/12.
@@ -151,10 +140,11 @@ public class NewsRecyclerFragment extends android.support.v4.app.Fragment {
         ObservableOnNextListener<String> listener = new ObservableOnNextListener<String>() {
             @Override
             public void onNext(String s) {
-               Log.i("onNext: ", "onNext: "+s);
+                //Log.i("onNext: ", "onNext: "+s);
+                SharedPreferenceUtil.saveData(getContext(),type,s);
                 Toutiao toutiao = XinWenJson.getdata(s, type);
                 toutiao_list = toutiao.getT1348647853363();
-                Log.i("onNext:", "toutiao_list.size: "+toutiao_list.size());
+               // Log.i("onNext:", "toutiao_list.size: "+toutiao_list.size());
                 if(toutiao_list.size()>0){
                     adapter.clearDatas();
                     adapter.addDatas(toutiao_list);
@@ -197,7 +187,7 @@ public class NewsRecyclerFragment extends android.support.v4.app.Fragment {
 
     public void lunboToActivity(int position){
         String type = listads.get(position).getSkipType();
-        Log.i( "onClick: ","type==="+type);
+        //Log.i( "onClick: ","type==="+type);
         int typecode ;
         if(type == null){
             typecode = NewsAdapter.PUTONG;

@@ -41,10 +41,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.NewsContentActivity" />
+        <activity android:name=".activity.NewsContentActivity"></activity>
         <activity android:name=".activity.MultiPhotoActivity" />
         <activity android:name=".activity.FMDetailActivity" />
         <activity android:name=".activity.MusicListActivity"></activity>
+        <activity android:name=".activity.TextSizeShowActivity"></activity>
     </application>
 
 </manifest>

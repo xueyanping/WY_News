@@ -1,10 +1,6 @@
 package com.xue.yado.wy_news.utils;
 
-import android.util.Log;
-
-import com.lidroid.xutils.util.LogUtils;
 import com.xue.yado.wy_news.bean.Toutiao;
-import com.xue.yado.wy_news.myView.NewsAdapter;
 
 import org.json.JSONArray;
 import org.json.JSONException;

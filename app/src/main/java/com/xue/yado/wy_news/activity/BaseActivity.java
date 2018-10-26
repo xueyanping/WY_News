@@ -16,11 +16,16 @@ import android.view.Window;
 import android.widget.Toast;
 
 import com.vondear.rxtools.view.RxToast;
+import com.xue.yado.wy_news.RxBus;
 import com.xue.yado.wy_news.broadCast.NetBroadcastReceiver;
 import com.xue.yado.wy_news.newWork.NetWorkUtils;
+import com.xue.yado.wy_news.utils.SharedPreferenceUtil;
 
+import io.reactivex.Observable;
 
 import static android.os.Build.VERSION_CODES.M;
+import static com.xue.yado.wy_news.newWork.NetWorkUtils.NETWORK_4G;
+import static com.xue.yado.wy_news.newWork.NetWorkUtils.NETWORK_WIFI;
 
 /**
  * Created by Administrator on 2018/10/16.
@@ -32,6 +37,7 @@ public abstract class BaseActivity extends AppCompatActivity implements NetBroad
 
     private NetBroadcastReceiver receiver;
     private Dialog dialog;
+    private Observable observable;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -47,10 +53,23 @@ public abstract class BaseActivity extends AppCompatActivity implements NetBroad
         registerReceiver(receiver, filter);
         dialog = new Dialog(this);
         requestPermission();
+
+        /**
+         * 设置字体相关
+         */
+//        observable = RxBus.getInstance().register(this.getClass().getSimpleName(), MessageSocket.class);
+//        observable.observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<MessageSocket>() {
+//
+//            @Override
+//            public void accept(MessageSocket message) throws Exception {
+//                rxBusCall(message);
+//            }
+//        });
+
     }
 
     public boolean isConnect(int netType){
-        if(netType == NetWorkUtils.NETWORK_WIFI ||  netType == NetWorkUtils.NETWORK_4G ||  netType == NetWorkUtils.NETWORK_3G ){
+        if(netType == NETWORK_WIFI ||  netType == NETWORK_4G ||  netType == NetWorkUtils.NETWORK_3G ){
             return true;
         }
         return false;
@@ -58,10 +77,18 @@ public abstract class BaseActivity extends AppCompatActivity implements NetBroad
 
     @Override
     public void onNetChange(int netType) {
-        //this.netType = netType;
-        // Log.i("xue", "onNetChange:接口被回调了 ");
+        SharedPreferenceUtil.saveNetState(this,netType,"newState");
+        String net = null;
         if(isConnect(netType)){
-            RxToast.success(this, "网络已连接", Toast.LENGTH_SHORT).show();
+            switch (netType){
+                case NETWORK_WIFI:
+                    net = "wifi";
+                    break;
+                case NETWORK_4G:
+                    net = "4G";
+                    break;
+            }
+            RxToast.success(this, net+"网络已连接", Toast.LENGTH_SHORT).show();
             dialog.dismiss();
         }else{
             showNetSettingDialog();
@@ -107,11 +134,61 @@ public abstract class BaseActivity extends AppCompatActivity implements NetBroad
         }
     }
 
+    /********************************************************设置字体相关 ******************/
+//    public void rxBusCall(MessageSocket message) {
+//    }
+//
+//
+//
+//
+//    public int getColorById(int resId) {
+//        return ContextCompat.getColor(this, resId);
+//    }
+//
+//
+//    public void goActivity(Class<?> activity) {
+//        Intent intent = new Intent();
+//        intent.setClass(getApplicationContext(), activity);
+//        startActivity(intent);
+//    }
+//
+//
+//
+//
+//    //重写字体缩放比例 api<25
+//    @Override
+//    public Resources getResources() {
+//        Resources res =super.getResources();
+//        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N) {
+//            Configuration config = res.getConfiguration();
+//            config.fontScale= App.getMyInstance().getFontScale();//1 设置正常字体大小的倍数
+//            res.updateConfiguration(config,res.getDisplayMetrics());
+//        }
+//        return res;
+//    }
+//    //重写字体缩放比例  api>25
+//    @Override
+//    protected void attachBaseContext(Context newBase) {
+//        if(Build.VERSION.SDK_INT>Build.VERSION_CODES.N){
+//            final Resources res = newBase.getResources();
+//            final Configuration config = res.getConfiguration();
+//            config.fontScale= App.getMyInstance().getFontScale();//1 设置正常字体大小的倍数
+//            final Context newContext = newBase.createConfigurationContext(config);
+//            super.attachBaseContext(newContext);
+//        }else{
+//            super.attachBaseContext(newBase);
+//        }
+//    }
+
+    /********************************************************设置字体相关 ******************/
+
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
         Log.i("广播被销毁", "onDestroy: ");
         unregisterReceiver(receiver);
+        RxBus.getInstance().unregister(this.getClass().getSimpleName(), observable);
     }
 
     public abstract int getLayoutId();

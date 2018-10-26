@@ -1,4 +1,4 @@
-package com.xue.yado.wy_news.myView;
+package com.xue.yado.wy_news.adapter;
 
 import android.content.Context;
 import android.graphics.BitmapFactory;

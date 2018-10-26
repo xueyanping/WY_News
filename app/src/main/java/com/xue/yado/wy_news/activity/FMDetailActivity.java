@@ -1,33 +1,22 @@
 package com.xue.yado.wy_news.activity;
 
-import android.app.Activity;
-
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-
-
 import android.content.ServiceConnection;
-
 import android.os.Build;
 import android.os.Bundle;
-
 import android.os.Handler;
 import android.os.IBinder;
-
 import android.support.annotation.RequiresApi;
-
 import android.view.Gravity;
 import android.view.View;
-
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
 import com.lidroid.xutils.BitmapUtils;
-
 import com.xue.yado.wy_news.R;
 import com.xue.yado.wy_news.bean.FM;
 import com.xue.yado.wy_news.listener.PlayListener;
@@ -39,7 +28,6 @@ import java.text.SimpleDateFormat;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 
 /**
@@ -47,7 +35,7 @@ import butterknife.OnClick;
  */
 
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-public class FMDetailActivity extends Activity implements View.OnClickListener,SeekBar.OnSeekBarChangeListener {
+public class FMDetailActivity extends BaseActivity implements View.OnClickListener,SeekBar.OnSeekBarChangeListener {
 
     @BindView(R.id.image)
      ImageView image;
@@ -82,10 +70,7 @@ public class FMDetailActivity extends Activity implements View.OnClickListener,S
     @BindView(R.id.next)
      ImageView next;
     @BindView(R.id.title)
-    TextView title;
-
-
-
+     TextView title;
 
 
     private boolean isbind = false;
@@ -103,7 +88,6 @@ public class FMDetailActivity extends Activity implements View.OnClickListener,S
 
     //使用ServiceConnection来监听Service状态的变化
     private ServiceConnection conn = new ServiceConnection() {
-
         @Override
         public void onServiceDisconnected(ComponentName name) {
             service = null;
@@ -139,7 +123,7 @@ public class FMDetailActivity extends Activity implements View.OnClickListener,S
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.fmdetail);
+       // setContentView(R.layout.fmdetail);
         ButterKnife.bind(this);
         initView();
         initClick();
@@ -156,7 +140,6 @@ public class FMDetailActivity extends Activity implements View.OnClickListener,S
     private void initView() {
         Intent i = getIntent();
         fm = (FM.DataBean.ListBean) i.getSerializableExtra("fm");
-
         title.setText(fm.getTitle());
 
         if(!isLocal){
@@ -231,7 +214,7 @@ public class FMDetailActivity extends Activity implements View.OnClickListener,S
                     stop.setImageResource(R.mipmap.bofang);
                     service.playOrStop(PlayService.isPause);
                     service.changeImage( PlayService.isPause);
-                   PlayService.isPause = true;
+                    PlayService.isPause = true;
                 }
 
                 break;
@@ -336,7 +319,13 @@ public class FMDetailActivity extends Activity implements View.OnClickListener,S
     @Override
     protected void onDestroy() {
         super.onDestroy();
+     stopService(intent);
+     unbindService(conn);
+    }
 
+    @Override
+    public int getLayoutId() {
+        return R.layout.fmdetail;
     }
 
 

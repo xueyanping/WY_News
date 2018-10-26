@@ -10,59 +10,31 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
 import android.os.Environment;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Looper;
-import android.os.Message;
 import android.support.annotation.RequiresApi;
-
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.ImageView;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
 import com.danikula.videocache.CacheListener;
 import com.danikula.videocache.HttpProxyCacheServer;
-import com.lidroid.xutils.BitmapUtils;
 import com.lidroid.xutils.HttpUtils;
-import com.lidroid.xutils.db.annotation.Check;
 import com.lidroid.xutils.exception.HttpException;
-import com.lidroid.xutils.http.HttpHandler;
 import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
-import com.lidroid.xutils.http.callback.RequestCallBackHandler;
 import com.vondear.rxtools.view.RxToast;
 import com.xue.yado.wy_news.App;
-
 import com.xue.yado.wy_news.R;
 import com.xue.yado.wy_news.bean.FM;
 import com.xue.yado.wy_news.listener.PlayListener;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-import okio.BufferedSink;
-import okio.Okio;
-import okio.Sink;
 
 /**
  * Created by Administrator on 2018/9/25.
@@ -94,12 +66,32 @@ public class PlayService extends Service implements MediaPlayer.OnCompletionList
     NotificationManager notificationManager,download_notificationManager;
     PlayListener listener;
 
+    //为了和Activity交互，须要定义一个Binder对象
+    public class AudioBinder extends Binder {
+        //返回Service对象
+        public PlayService getService(){
+            return PlayService.this;
+        }
+    }
+
+    @Override
+    public IBinder onBind(Intent arg0) {
+        return binder;
+    }
+    /**
+     * 当Audio播放完的时候触发该动作
+     */
+    @Override
+    public void onCompletion(MediaPlayer player) {
+        stopSelf();//结束了。则结束Service
+    }
+
+
     public void setPlayerListener(PlayListener listener){
         this.listener = listener;
     }
 
-    public  class NotificationBroadcastReceiver extends BroadcastReceiver
-    {
+    public  class NotificationBroadcastReceiver extends BroadcastReceiver{
         @Override
         public void onReceive(Context context, Intent intent) {
             String str = intent.getAction();
@@ -153,17 +145,6 @@ public class PlayService extends Service implements MediaPlayer.OnCompletionList
     }
 
 
-    @Override
-    public IBinder onBind(Intent arg0) {
-        return binder;
-    }
-    /**
-     * 当Audio播放完的时候触发该动作
-     */
-    @Override
-    public void onCompletion(MediaPlayer player) {
-        stopSelf();//结束了。则结束Service
-    }
 
     //在这里我们须要实例化MediaPlayer对象
     public void onCreate(){
@@ -243,13 +224,7 @@ public class PlayService extends Service implements MediaPlayer.OnCompletionList
         }
     }
 
-    //为了和Activity交互，须要定义一个Binder对象
-   public class AudioBinder extends Binder {
-        //返回Service对象
-        public PlayService getService(){
-            return PlayService.this;
-        }
-    }
+
 
     public void playOrStop(boolean ispause){
         if(player == null){

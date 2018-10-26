@@ -9,7 +9,6 @@ import android.widget.TextView;
 
 import com.xue.yado.wy_news.R;
 import com.xue.yado.wy_news.bean.FM;
-import com.xue.yado.wy_news.bean.LocalMusic;
 import com.xue.yado.wy_news.myView.SlidingButtonView;
 import com.xue.yado.wy_news.utils.Utils;
 
@@ -75,20 +74,14 @@ public class Adapter extends RecyclerView.Adapter<Adapter.MyViewHolder> implemen
 
         View view = LayoutInflater.from(mContext).inflate(R.layout.layout_item, arg0, false);
         MyViewHolder holder = new MyViewHolder(view);
-
         return holder;
     }
 
-//    public void addData(int position) {
-//        mDatas.add(position, "添加项");
-//        notifyItemInserted(position);
-//    }
 
     public void setData(List<FM.DataBean.ListBean> list){
         mDatas.clear();
         mDatas.addAll(list);
         notifyDataSetChanged();
-
     }
 
 
@@ -158,7 +151,6 @@ public class Adapter extends RecyclerView.Adapter<Adapter.MyViewHolder> implemen
             btn_Delete = (TextView) itemView.findViewById(R.id.tv_delete);
             textView = (TextView) itemView.findViewById(R.id.text);
             layout_content = (ViewGroup) itemView.findViewById(R.id.layout_content);
-
             ((SlidingButtonView) itemView).setSlidingButtonListener(Adapter.this);
         }
 

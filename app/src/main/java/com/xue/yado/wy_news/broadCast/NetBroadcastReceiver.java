@@ -4,10 +4,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
-import android.util.Log;
 
-import com.xue.yado.wy_news.activity.BaseActivity;
 import com.xue.yado.wy_news.newWork.NetWorkUtils;
+import com.xue.yado.wy_news.utils.SharedPreferenceUtil;
 
 
 /**
@@ -21,11 +20,12 @@ public class NetBroadcastReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         //若相等则网络状态发生变化
         if(intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)){
-            Log.i("xue", "onReceive:网络状态发生变化 ");
             int netState = NetWorkUtils.getNetWorkType(context);
-            event.onNetChange(netState);
+            int a = SharedPreferenceUtil.getNetState(context,"newState");
+            if(netState != a){
+                event.onNetChange(netState);
+            }
         }
-
     }
 
     public interface netEventListener{

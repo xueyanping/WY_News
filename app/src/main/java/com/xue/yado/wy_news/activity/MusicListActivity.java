@@ -5,23 +5,21 @@ package com.xue.yado.wy_news.activity;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
+
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 
 
+import com.vondear.rxtools.view.RxToast;
 import com.xue.yado.wy_news.R;
 import com.xue.yado.wy_news.adapter.Adapter;
 import com.xue.yado.wy_news.bean.FM;
-import com.xue.yado.wy_news.bean.LocalMusic;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,7 +42,6 @@ public class MusicListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_von_photo);
         ButterKnife.bind(this);
         scanMusic();
-       // initData();
         initViews();
     }
 
@@ -56,7 +53,7 @@ public class MusicListActivity extends AppCompatActivity {
         mAdapter.setIonSlidingViewClickListener(new Adapter.IonSlidingViewClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-
+                RxToast.info(list.get(position).getTitle());
             }
 
             @Override
@@ -67,6 +64,9 @@ public class MusicListActivity extends AppCompatActivity {
     }
 
 
+    /**
+     * 扫描本地FM
+     */
     public void scanMusic(){
         list = new ArrayList<>();
         Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;

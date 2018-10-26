@@ -5,7 +5,6 @@
     android:layout_height="60dp"
     android:background="@mipmap/titlebar_background"
     android:gravity="center_vertical"
-    android:layout_marginTop="15dp"
     android:orientation="horizontal" >
 
     <ImageButton

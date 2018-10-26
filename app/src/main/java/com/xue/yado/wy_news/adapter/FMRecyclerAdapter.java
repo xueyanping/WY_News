@@ -1,4 +1,4 @@
-package com.xue.yado.wy_news.myView;
+package com.xue.yado.wy_news.adapter;
 
 import android.content.Context;
 import android.graphics.BitmapFactory;
@@ -15,6 +15,7 @@ import com.lidroid.xutils.BitmapUtils;
 import com.xue.yado.wy_news.R;
 import com.xue.yado.wy_news.bean.FM;
 import com.xue.yado.wy_news.bean.Toutiao;
+import com.xue.yado.wy_news.myView.BaseViewHolder;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -68,8 +69,9 @@ public abstract class FMRecyclerAdapter<T> extends RecyclerView.Adapter<Recycler
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         if (!isHeaderView(position) && !isFooterView(position)) {
-            if (haveHeaderView())
+            if (haveHeaderView()){
                 position--;
+            }
             BaseViewHolder viewHolder = (BaseViewHolder) holder;
             onBindViewHolder(viewHolder,toutiao_list.get(position),position);
         }
